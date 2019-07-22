@@ -10,9 +10,15 @@ namespace ConsoleTester
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var reqParser = new ReqParser();
+            await reqParser.LoadFromFile("a.htm");
+            var list = await reqParser.GetRequiermentsListAsync();
+
+            Console.WriteLine(list.Select(x => $"Level: {x.Level} ID: {x.ID} Text:{x.Text}")
+                                  .Aggregate((acc, x) => acc + "\n" + x));
+            Console.ReadKey(true);
         }
     }
 }
