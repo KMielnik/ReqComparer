@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HtmlAgilityPack;
 
 namespace ReqComparer
 {
-    public class Class1
+    public class ReqParser
     {
+
     }
 }
