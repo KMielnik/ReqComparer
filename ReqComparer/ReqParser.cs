@@ -30,6 +30,13 @@ namespace ReqComparer
                         .Split('\n')
                         .Where(y => string.IsNullOrWhiteSpace(y) == false);
 
+                    var margin = int.Parse(x.
+                        GetAttributeValue("style", "-1")
+                        .Replace("margin-left: ", "")
+                        .Replace("px", ""));
+
+                    int indentLevel = (margin - 108) / 36;
+
                     return new Requirement(
                         reqStrings
                             .FirstOrDefault()
@@ -38,7 +45,7 @@ namespace ReqComparer
                             .Skip(1)
                             .FirstOrDefault()
                             ?.Trim(),
-                        0);
+                        indentLevel);
                 })
                 .ToList();
 
