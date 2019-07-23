@@ -13,11 +13,11 @@ namespace ConsoleTester
         static async Task Main(string[] args)
         {
             var reqParser = new ReqParser();
-            await reqParser.LoadFromFile("a.htm");
-            var list = await reqParser.GetRequiermentsListAsync();
+            await reqParser.LoadFromFile("c.htm");
+            var list = reqParser.GetRequiermentsList();
 
-            Console.WriteLine(list.Select(x => $"Level: {x.Level} ID: {x.ID} Text:{x.Text}")
-                                  .Aggregate((acc, x) => acc + "\n" + x));
+            //Console.WriteLine(reqParser.GetRequiermentsString());
+            Console.WriteLine(list.Aggregate("",(acc,x)=>acc+x.ToString()+"\n"));
             Console.ReadKey(true);
         }
     }
