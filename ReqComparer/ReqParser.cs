@@ -73,8 +73,8 @@ namespace ReqComparer
                         .Replace("TC ID & Title:", "")
                         .Trim()
                         .Split('\t')
-                        .Where(z=>!string.IsNullOrWhiteSpace(z))
-                        .Where(y=>
+                        .Where(z => !string.IsNullOrWhiteSpace(z))
+                        .Where(y =>
                         {
                             var validFromTo = Regex.Match(y, @"\[.*\]");
                             if (validFromTo.Success == false)
@@ -91,7 +91,7 @@ namespace ReqComparer
                             id = Regex.Replace(id, @" - .*", "");
 
                             var tcText = Regex.Match(y, "TC.*").Value;
-                            
+
                             return (id, tcText);
                         })
                         .ToList();
@@ -108,17 +108,17 @@ namespace ReqComparer
         }
 
         public string GetRequiermentsString()
-        {
-            return GetRequiermentsList()
+            => GetRequiermentsList()
                 .Select(x => $"{new string('\t', x.Level)}{x.ID}: {x.Text}\n")
                 .Aggregate((acc, x) => acc + x);
-        }
+        
     }
 
     public class Requirement
     {
         public static Dictionary<string, string> TCTexts = new Dictionary<string, string>();
         public string ID { get; private set; }
+        public int IDValue { get => int.Parse(ID.Replace("PR_PH_", "")); }
         public string Text { get; private set; }
         public int Level { get; private set; }
         public readonly List<string> TCIDs;
@@ -130,12 +130,13 @@ namespace ReqComparer
             Level = level;
 
             TCIDs = new List<string>();
-            foreach(var TC in TCs)
+
+            TCs.ForEach(TC =>
             {
                 TCIDs.Add(TC.ID);
 
                 TCTexts[TC.ID] = TC.Text;
-            }
+            });
         }
 
         public override string ToString()
