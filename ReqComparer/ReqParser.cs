@@ -79,10 +79,7 @@ namespace ReqComparer
                             if (validFromTo.Success == false)
                                 return true;
 
-                            if (validFromTo.Value.Contains('-'))
-                                return true;
-
-                            return false;
+                            return validFromTo.Value.Contains('-');
                         })
                         .Select(y =>
                         {

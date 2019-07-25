@@ -13,7 +13,7 @@ namespace ConsoleTester
         static async Task Main(string[] args)
         {
             var reqParser = new ReqParser();
-            await reqParser.LoadFromFile("c.htm");
+            await reqParser.LoadFromFile("d.htm");
             var list = reqParser.GetRequiermentsList();
 
             //Console.WriteLine(reqParser.GetRequiermentsString());
