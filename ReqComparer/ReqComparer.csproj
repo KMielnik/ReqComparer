@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="ReqParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Requirement.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

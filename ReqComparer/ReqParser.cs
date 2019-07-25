@@ -11,19 +11,18 @@ namespace ReqComparer
 {
     public class ReqParser
     {
-        private HtmlDocument document = new HtmlDocument();
+        private readonly HtmlDocument document = new HtmlDocument();
 
         public async Task LoadFromFile(string filename)
-        {
-            await Task.Run(() =>
-            {
-                string text = File.ReadAllText(filename);
-                text = text.Replace("<br>", "\t");
-                File.WriteAllText(filename, text);
+            => await Task.Run(() =>
+                {
+                    string text = File.ReadAllText(filename);
+                    text = text.Replace("<br>", "\t");
+                    File.WriteAllText(filename, text);
 
-                document.Load(filename);
-            });
-        }
+                    document.Load(filename);
+                });
+        
 
         public List<Requirement> GetRequiermentsList()
         {
@@ -60,8 +59,8 @@ namespace ReqComparer
                         .FirstOrDefault()
                         ?.Trim();
 
-                    var margin = int.Parse(x.
-                        GetAttributeValue("style", "-1")
+                    var margin = int.Parse(x
+                        .GetAttributeValue("style", "-1")
                         .Replace("margin-left: ", "")
                         .Replace("px", ""));
 
@@ -111,36 +110,5 @@ namespace ReqComparer
             => GetRequiermentsList()
                 .Select(x => $"{new string('\t', x.Level)}{x.ID}: {x.Text}\n")
                 .Aggregate((acc, x) => acc + x);
-        
-    }
-
-    public class Requirement
-    {
-        public static Dictionary<string, string> TCTexts = new Dictionary<string, string>();
-        public string ID { get; private set; }
-        public int IDValue { get => int.Parse(ID.Replace("PR_PH_", "")); }
-        public string Text { get; private set; }
-        public int Level { get; private set; }
-        public readonly List<string> TCIDs;
-
-        public Requirement(string iD, string text, int level, List<(string ID, string Text)> TCs)
-        {
-            ID = iD;
-            Text = text;
-            Level = level;
-
-            TCIDs = new List<string>();
-
-            TCs.ForEach(TC =>
-            {
-                TCIDs.Add(TC.ID);
-
-                TCTexts[TC.ID] = TC.Text;
-            });
-        }
-
-        public override string ToString()
-            => $"Level: {Level} ID: {ID} Text:{Text}\n" +
-                "\tTCs:" + TCIDs.Aggregate("", (acc, x) => acc + x + " ") + "\n";
     }
 }
