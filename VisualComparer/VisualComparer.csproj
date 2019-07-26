@@ -93,5 +93,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReqComparer\ReqComparer.csproj">
+      <Project>{8d1e56b9-d6fe-4168-a516-8357524f21be}</Project>
+      <Name>ReqComparer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

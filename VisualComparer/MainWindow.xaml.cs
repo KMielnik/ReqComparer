@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
+using ReqComparer;
 
 namespace VisualComparer
 {
@@ -20,9 +22,28 @@ namespace VisualComparer
     /// </summary>
     public partial class MainWindow : Window
     {
+        ReqParser parser;
+        ObservableCollection<Requirement> reqsCollection { get; set; }
         public MainWindow()
         {
             InitializeComponent();
+            parser = new ReqParser();
+            reqsCollection = new ObservableCollection<Requirement>();
+        }
+
+        private async void ShowButton_Click(object sender, RoutedEventArgs e)
+        {
+            await parser.LoadFromFile("d.htm");
+            var reqs = parser.GetRequiermentsList();
+
+            reqsCollection.Clear();
+            reqs.ForEach(x => reqsCollection.Add(x));
+        }
+
+        private void RequirementsDataGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            var dataGrid = (DataGrid)sender;
+            dataGrid.ItemsSource = reqsCollection;
         }
     }
 }
