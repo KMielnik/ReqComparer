@@ -143,5 +143,12 @@ namespace VisualComparer
             RequirementsDataGridLeft.Items.Refresh();
             RequirementsDataGridRight.Items.Refresh();
         }
+
+        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScrollViewer scv = (ScrollViewer)sender;
+            scv.ScrollToVerticalOffset(scv.VerticalOffset - (e.Delta / 3));
+            e.Handled = true;
+        }
     }
 }
