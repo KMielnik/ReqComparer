@@ -63,7 +63,7 @@ namespace VisualComparer
 
             DataGridTextColumn reqID = new DataGridTextColumn();
             reqID.Header = "ID";
-            reqID.Binding = new Binding("ID");
+            reqID.Binding = new Binding(nameof(Requirement.ID));
             reqID.IsReadOnly = true;
             dataGrid.Columns.Add(reqID);
 
@@ -80,6 +80,24 @@ namespace VisualComparer
             dataGrid.Columns.Add(tcIDs);
 
             setColorTriggers(dataGrid);
+            setBoldDataTrigger(dataGrid);
+        }
+
+        private void setBoldDataTrigger(DataGrid datagrid)
+        {
+            var dataTrigger = new DataTrigger()
+            {
+                Binding = new Binding(nameof(Requirement.IsImportant)),
+                Value = true
+            };
+
+            dataTrigger.Setters.Add(new Setter()
+            {
+                Property = FontWeightProperty,
+                Value = FontWeights.Bold
+            });
+
+            datagrid.RowStyle.Triggers.Add(dataTrigger);
         }
 
         private void setColorTriggers(DataGrid dataGrid)
@@ -121,6 +139,16 @@ namespace VisualComparer
         {
             var comboBox = sender as ComboBox;
 
+            foreach (var req in reqsCollection)
+            {
+                if (comboBox.Name.Contains("Left"))
+                    req.HighlightedRowLeft = false;
+                if (comboBox.Name.Contains("Right"))
+                    req.HighlightedRowRight = false;
+            }
+            if (!(comboBox.SelectedValue is int))
+                return;
+
             int selectedTC = (int)comboBox.SelectedValue;
 
             foreach (var req in reqsCollection)
@@ -131,13 +159,6 @@ namespace VisualComparer
                         req.HighlightedRowLeft = true;
                     if (comboBox.Name.Contains("Right"))
                         req.HighlightedRowRight = true;
-                }
-                else
-                {
-                    if (comboBox.Name.Contains("Left"))
-                        req.HighlightedRowLeft = false;
-                    if (comboBox.Name.Contains("Right"))
-                        req.HighlightedRowRight = false;
                 }
             }
             RequirementsDataGridLeft.Items.Refresh();
