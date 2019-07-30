@@ -45,6 +45,9 @@ namespace VisualComparer
                 .OrderBy(x=>x)
                 .ToList();
 
+            LeftTCComboBox.Items.Clear();
+            RightTCComboBox.Items.Clear();
+
             allTCs.ForEach(x =>
             {
                 LeftTCComboBox.Items.Add(x);
@@ -129,7 +132,16 @@ namespace VisualComparer
                     if (comboBox.Name.Contains("Right"))
                         req.HighlightedRowRight = true;
                 }
+                else
+                {
+                    if (comboBox.Name.Contains("Left"))
+                        req.HighlightedRowLeft = false;
+                    if (comboBox.Name.Contains("Right"))
+                        req.HighlightedRowRight = false;
+                }
             }
+            RequirementsDataGridLeft.Items.Refresh();
+            RequirementsDataGridRight.Items.Refresh();
         }
     }
 }
