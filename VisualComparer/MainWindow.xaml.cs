@@ -163,6 +163,25 @@ namespace VisualComparer
             }
             RequirementsDataGridLeft.Items.Refresh();
             RequirementsDataGridRight.Items.Refresh();
+
+            CountReqsOccurences();
+        }
+
+        private void CountReqsOccurences()
+        {
+            int leftCount = 0, rightCount = 0, bothCount = 0;
+            foreach(var req in reqsCollection)
+            {
+                if (req.HighlightedRowLeft && req.HighlightedRowRight)
+                    bothCount++;
+                if (req.HighlightedRowLeft)
+                    leftCount++;
+                if (req.HighlightedRowRight)
+                    rightCount++;
+            }
+            ReqsCoveredLeft.Text = leftCount.ToString();
+            ReqsCoveredCenter.Text = bothCount.ToString();
+            ReqsCoveredRight.Text = rightCount.ToString();
         }
 
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
