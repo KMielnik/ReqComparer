@@ -61,23 +61,32 @@ namespace VisualComparer
             dataGrid.ItemsSource = reqsCollection;
             dataGrid.Columns.Clear();
 
-            DataGridTextColumn reqID = new DataGridTextColumn();
-            reqID.Header = "ID";
-            reqID.Binding = new Binding(nameof(Requirement.ID));
-            reqID.IsReadOnly = true;
-            dataGrid.Columns.Add(reqID);
+            dataGrid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "ID",
+                Binding = new Binding(nameof(Requirement.ID)),
+                IsReadOnly = true
+            });
 
-            DataGridTextColumn reqText = new DataGridTextColumn();
-            reqText.Header = "Text";
-            reqText.Binding = new Binding(nameof(Requirement.TextIntended));
-            reqText.IsReadOnly = true;
-            reqText.Width = 500;
-            dataGrid.Columns.Add(reqText);
+            dataGrid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Text",
+                Binding = new Binding(nameof(Requirement.TextIntended)),
+                IsReadOnly = true,
+                Width = 500
+            });
 
-            DataGridTextColumn tcIDs = new DataGridTextColumn();
-            tcIDs.Header = "TCs";
-            tcIDs.Binding = new Binding(nameof(Requirement.TCStringified));
-            dataGrid.Columns.Add(tcIDs);
+            dataGrid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "TCs",
+                Binding = new Binding(nameof(Requirement.TCStringified))
+            });
+
+            dataGrid.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Functional Variants",
+                Binding = new Binding(nameof(Requirement.FVariants))
+            });
 
             setColorTriggers(dataGrid);
             setBoldDataTrigger(dataGrid);
@@ -146,21 +155,22 @@ namespace VisualComparer
                 if (comboBox.Name.Contains("Right"))
                     req.HighlightedRowRight = false;
             }
-            if (!(comboBox.SelectedValue is int))
-                return;
-
-            int selectedTC = (int)comboBox.SelectedValue;
-
-            foreach (var req in reqsCollection)
+            if (comboBox.SelectedValue is int)
             {
-                if (req.TCIDsValue.Contains(selectedTC))
+                var selectedTC = (int)comboBox.SelectedValue;
+
+                foreach (var req in reqsCollection)
                 {
-                    if(comboBox.Name.Contains("Left"))
-                        req.HighlightedRowLeft = true;
-                    if (comboBox.Name.Contains("Right"))
-                        req.HighlightedRowRight = true;
+                    if (req.TCIDsValue.Contains(selectedTC))
+                    {
+                        if (comboBox.Name.Contains("Left"))
+                            req.HighlightedRowLeft = true;
+                        if (comboBox.Name.Contains("Right"))
+                            req.HighlightedRowRight = true;
+                    }
                 }
             }
+
             RequirementsDataGridLeft.Items.Refresh();
             RequirementsDataGridRight.Items.Refresh();
 
@@ -170,7 +180,7 @@ namespace VisualComparer
         private void CountReqsOccurences()
         {
             int leftCount = 0, rightCount = 0, bothCount = 0;
-            foreach(var req in reqsCollection)
+            foreach (var req in reqsCollection)
             {
                 if (req.HighlightedRowLeft && req.HighlightedRowRight)
                     bothCount++;

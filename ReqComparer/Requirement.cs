@@ -11,6 +11,7 @@ namespace ReqComparer
         public int IDValue { get => int.Parse(ID.Replace("PR_PH_", "")); }
         public string Text { get; private set; }
         public string TextIntended { get => new string(' ', Level * 3) + Text; }
+        public string FVariants { get; set; }
         public int Level { get; private set; }
         public readonly List<string> TCIDs;
         public IEnumerable<int> TCIDsValue { get => TCIDs.Select(x => int.Parse(x)); }
@@ -19,11 +20,13 @@ namespace ReqComparer
         public bool HighlightedRowLeft { get; set; }
         public bool IsImportant { get => !Regex.IsMatch(Text, @"^[A-Za-z]+?:"); }
         
-        public Requirement(string iD, string text, int level, List<(string ID, string Text)> TCs)
+        public Requirement(string iD, string text, int level, List<(string ID, string Text)> TCs, string fVariants)
         {
             ID = iD;
             Text = text;
             Level = level;
+
+            FVariants = fVariants;
 
             TCIDs = new List<string>();
 
@@ -36,7 +39,7 @@ namespace ReqComparer
         }
 
         public override string ToString()
-            => $"Level: {Level} ID: {ID} Text:{Text}\n" +
+            => $"Level: {Level} ID: {ID} Text:{Text} FVariants:{FVariants}\n" +
                 "\tTCs:" + TCIDs.Aggregate("", (acc, x) => acc + x + " ") + "\n";
     }
 }
