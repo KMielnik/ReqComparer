@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="VisualComparer.DoubleRequirementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisualComparer"
+             mc:Ignorable="d" 
+             Background="White"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="0" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <DataGrid Name="RequirementsDataGridLeft" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" Loaded="RequirementsDataGrid_Loaded">
+                    <DataGrid.RowStyle>
+                        <Style></Style>
+                    </DataGrid.RowStyle>
+                </DataGrid>
+                <DataGrid Name="RequirementsDataGridRight" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,10" Loaded="RequirementsDataGrid_Loaded">
+                    <DataGrid.RowStyle>
+                        <Style></Style>
+                    </DataGrid.RowStyle>
+                </DataGrid>
+            </Grid>
+        </ScrollViewer>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="TC: " VerticalAlignment="Center"/>
+                <ComboBox Name="LeftTCComboBox" Width="120" SelectionChanged="TCComboBox_SelectionChanged"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="TC: " VerticalAlignment="Center"/>
+                <ComboBox Name="RightTCComboBox" Width="120" SelectionChanged="TCComboBox_SelectionChanged"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,20,10">
+                    <TextBlock Text="Reqs covered by left TC:"/>
+                    <TextBlock x:Name="ReqsCoveredLeft" Text="X" HorizontalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,10,20,10">
+                    <TextBlock Text="Reqs in both TCs:"/>
+                    <TextBlock x:Name="ReqsCoveredCenter" Text="X" HorizontalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,10,10,10">
+                    <TextBlock Text="Reqs covered by rightt TC:"/>
+                    <TextBlock x:Name="ReqsCoveredRight" Text="X" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+</UserControl>
