@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace ReqComparer
 {
@@ -17,10 +18,10 @@ namespace ReqComparer
             => await Task.Run(() =>
                 {
                     string text = File.ReadAllText(filename);
-                    text = text.Replace("<br>", "\t");
-                    File.WriteAllText(filename, text);
+                    text = text.Replace("<br>", "\t");                  
+                    File.WriteAllText("m"+filename, text);
 
-                    document.Load(filename);
+                    document.Load("m"+filename);
                 });
         
 
@@ -47,7 +48,8 @@ namespace ReqComparer
                         .InnerText
                         .Trim()
                         .Split('\n')
-                        .Where(y => string.IsNullOrWhiteSpace(y) == false);
+                        .Where(y => string.IsNullOrWhiteSpace(y) == false)
+                        .Select(y => WebUtility.HtmlDecode(y));
 
                     var ID = reqStrings
                         .FirstOrDefault()
@@ -79,10 +81,7 @@ namespace ReqComparer
                             if (validFromTo.Success == false)
                                 return true;
 
-                            if (validFromTo.Value.Contains('-'))
-                                return true;
-
-                            return false;
+                            return validFromTo.Value.Contains('-');
                         })
                         .Select(y =>
                         {
@@ -95,11 +94,20 @@ namespace ReqComparer
                         })
                         .ToList();
 
+                    var fVariants = reqStrings
+                        .SkipWhile(y => !y.Contains("Functional Variants (use CTRL-R for edit):"))
+                        .TakeWhile(y => !y.Contains("Hardware Variants (use CTRL-R for edit):"))
+                        .Select(y => y.Trim())
+                        .Aggregate("", (acc, y) => acc + y)
+                        .Replace("Functional Variants (use CTRL-R for edit):","")
+                        .Trim();
+
                     return new Requirement(
                         ID,
                         text,
                         indentLevel,
-                        TCs);
+                        TCs,
+                        fVariants);
                 })
                 .ToList();
 
