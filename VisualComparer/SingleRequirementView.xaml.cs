@@ -137,8 +137,7 @@ namespace VisualComparer
             {
                 DataGridTextColumn TCColumn = new DataGridTextColumn
                 {
-                    Header = TCSelected.ToString(),
-                    Binding = new Binding(nameof(RequirementSingleView.TCCovered) + "[" + TCSelected + "]"),
+                    Header = TCSelected.ToString()
                 };
 
                 var dataTrigger = new DataTrigger()
