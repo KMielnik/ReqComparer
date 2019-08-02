@@ -29,8 +29,9 @@ namespace VisualComparer
             reqsCollection = new ObservableCollection<RequirementDoubleView>();
             this.basicReqs = basicReqs;
             this.basicReqs.CollectionChanged += BasicReqs_CollectionChanged;
-            
-            
+
+            SetRequirementsDataGrid(RequirementsDataGridRight);
+            SetRequirementsDataGrid(RequirementsDataGridLeft);
         }
 
         private void BasicReqs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -55,9 +56,8 @@ namespace VisualComparer
             });
         }
 
-        private void RequirementsDataGrid_Loaded(object sender, RoutedEventArgs e)
+        private void SetRequirementsDataGrid(DataGrid dataGrid)
         {
-            var dataGrid = (DataGrid)sender;
             dataGrid.ItemsSource = reqsCollection;
             dataGrid.Columns.Clear();
 
@@ -90,6 +90,11 @@ namespace VisualComparer
 
             setColorTriggers(dataGrid);
             setBoldDataTrigger(dataGrid);
+        }
+
+        private void RequirementsDataGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+           
         }
 
         private void setBoldDataTrigger(DataGrid datagrid)

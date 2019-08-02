@@ -18,10 +18,10 @@ namespace ReqComparer
             => await Task.Run(() =>
                 {
                     string text = File.ReadAllText(filename);
-                    text = text.Replace("<br>", "\t");                  
-                    File.WriteAllText("m"+filename, text);
+                    text = text.Replace("<br>", "\t");
+                    File.WriteAllText("m" + filename, text);
 
-                    document.Load("m"+filename);
+                    document.Load("m" + filename);
                 });
         
 
