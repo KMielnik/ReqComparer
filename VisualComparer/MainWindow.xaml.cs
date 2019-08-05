@@ -25,19 +25,13 @@ namespace VisualComparer
         ReqParser parser;
         public ObservableCollection<Requirement> reqsCollection { get; set; }
 
-        private SingleRequirementView singleRequirementView;
-        private DoubleRequirementView doubleRequirementView;
-
         public MainWindow()
         {
             InitializeComponent();
             parser = new ReqParser();
             reqsCollection = new ObservableCollection<Requirement>();
 
-            singleRequirementView = new SingleRequirementView(reqsCollection);
-            doubleRequirementView = new DoubleRequirementView(reqsCollection);
-
-            RequirementsArea.Content = singleRequirementView;
+            RequirementsArea.Content = new SingleRequirementView(reqsCollection);
         }
 
         private async void ShowButton_Click(object sender, RoutedEventArgs e)
@@ -51,10 +45,10 @@ namespace VisualComparer
 
         private void SwitchViewButton_Click(object sender, RoutedEventArgs e)
         {
-            if (RequirementsArea.Content == singleRequirementView)
-                RequirementsArea.Content = doubleRequirementView;
+            if (RequirementsArea.Content is SingleRequirementView)
+                RequirementsArea.Content = new DoubleRequirementView(reqsCollection);
             else
-                RequirementsArea.Content = singleRequirementView;
+                RequirementsArea.Content = new SingleRequirementView(reqsCollection);
         }
     }
 }

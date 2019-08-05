@@ -32,9 +32,11 @@ namespace VisualComparer
 
             SetRequirementsDataGrid(RequirementsDataGridRight);
             SetRequirementsDataGrid(RequirementsDataGridLeft);
+
+            RefreshRequirementsDataGrid();
         }
 
-        private void BasicReqs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void RefreshRequirementsDataGrid()
         {
             reqsCollection.Clear();
             foreach (var req in basicReqs)
@@ -54,6 +56,11 @@ namespace VisualComparer
                 LeftTCComboBox.Items.Add(x);
                 RightTCComboBox.Items.Add(x);
             });
+        }
+
+        private void BasicReqs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            RefreshRequirementsDataGrid();
         }
 
         private void SetRequirementsDataGrid(DataGrid dataGrid)
@@ -90,11 +97,6 @@ namespace VisualComparer
 
             setColorTriggers(dataGrid);
             setBoldDataTrigger(dataGrid);
-        }
-
-        private void RequirementsDataGrid_Loaded(object sender, RoutedEventArgs e)
-        {
-           
         }
 
         private void setBoldDataTrigger(DataGrid datagrid)

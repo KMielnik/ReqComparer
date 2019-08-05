@@ -19,9 +19,9 @@ namespace ReqComparer
                 {
                     string text = File.ReadAllText(filename);
                     text = text.Replace("<br>", "\t");
-                    File.WriteAllText("m" + filename, text);
+                    File.WriteAllText(filename + ".tmp", text);
 
-                    document.Load("m" + filename);
+                    document.Load(filename + ".tmp");
                 });
         
 
@@ -74,7 +74,7 @@ namespace ReqComparer
                         .Replace("TC ID & Title:", "")
                         .Trim()
                         .Split('\t')
-                        .Where(z => !string.IsNullOrWhiteSpace(z))
+                        .Where(y => !string.IsNullOrWhiteSpace(y))
                         .Where(y =>
                         {
                             var validFromTo = Regex.Match(y, @"\[.*\]");

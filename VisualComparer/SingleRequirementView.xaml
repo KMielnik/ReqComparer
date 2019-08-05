@@ -30,7 +30,7 @@
                                     <ControlTemplate TargetType="ListBoxItem">
                                         <CheckBox Margin="5,2"
                                           IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
-                                            <ContentPresenter />
+                                            <ContentPresenter/>
                                         </CheckBox>
                                     </ControlTemplate>
                                 </Setter.Value>
@@ -40,12 +40,23 @@
                 </ListBox>
             </StackPanel>
         </ScrollViewer>
-        <DataGrid Name="RequirementsDataGrid" Grid.Column="1" 
-                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                  Margin="10,10,10,10" AutoGenerateColumns="False">
-            <DataGrid.RowStyle>
-                <Style></Style>
-            </DataGrid.RowStyle>
-        </DataGrid>
+        <Grid Grid.Column="1" Margin="10">
+            <DataGrid Name="ReqHelperTop" Height="20" VerticalAlignment="Top"
+                      HeadersVisibility="None" VerticalScrollBarVisibility="Disabled"
+                      CanUserAddRows="False" IsReadOnly="True"/>
+            
+            <DataGrid Name="RequirementsDataGrid" Grid.Column="1"  CanUserSortColumns="False"
+                  Margin="0 20" AutoGenerateColumns="False" HeadersVisibility="Column"
+                  ScrollViewer.ScrollChanged="RequirementsDataGrid_ScrollChanged"
+                      LayoutUpdated="RequirementsDataGrid_LayoutUpdated">
+                <DataGrid.RowStyle>
+                    <Style></Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+            
+            <DataGrid Name="ReqHelperBottom" Height="20" VerticalAlignment="Bottom"
+                      HeadersVisibility="None" VerticalScrollBarVisibility="Disabled"
+                      CanUserAddRows="False" IsReadOnly="True"/>
+        </Grid>
     </Grid>
 </UserControl>
