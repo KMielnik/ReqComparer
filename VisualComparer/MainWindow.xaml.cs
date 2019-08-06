@@ -22,7 +22,7 @@ namespace VisualComparer
     /// </summary>
     public partial class MainWindow : Window
     {
-        ReqParser parser;
+        readonly ReqParser parser;
         public ObservableCollection<Requirement> reqsCollection { get; set; }
 
         public MainWindow()
@@ -34,13 +34,19 @@ namespace VisualComparer
             RequirementsArea.Content = new SingleRequirementView(reqsCollection);
         }
 
-        private async void ShowButton_Click(object sender, RoutedEventArgs e)
+        private async Task LoadReqsFromFile(string filename)
         {
-            await parser.LoadFromFile("d.htm");
+
+            await parser.LoadFromFile(filename);
             var reqs = parser.GetRequiermentsList();
 
             reqsCollection.Clear();
             reqs.ForEach(x => reqsCollection.Add(x));
+        }
+
+        private async void ShowButton_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadReqsFromFile("d.htm");
         }
 
         private void SwitchViewButton_Click(object sender, RoutedEventArgs e)
@@ -49,6 +55,25 @@ namespace VisualComparer
                 RequirementsArea.Content = new DoubleRequirementView(reqsCollection);
             else
                 RequirementsArea.Content = new SingleRequirementView(reqsCollection);
+        }
+
+        private async void FileSelector_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                DefaultExt = ".htm",
+                Filter = "HTML Files (*.htm)|*.htm"
+            };
+
+            if (dlg.ShowDialog() == true)
+                await LoadReqsFromFile(dlg.FileName);
+        }
+
+        private async void Grid_Drop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files[0].Contains(".htm"))
+                await LoadReqsFromFile(files[0]);
         }
     }
 }
