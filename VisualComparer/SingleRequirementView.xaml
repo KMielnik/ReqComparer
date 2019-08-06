@@ -41,12 +41,12 @@
             </StackPanel>
         </ScrollViewer>
         <Grid Grid.Column="1" Margin="10">
-            <DataGrid Name="ReqHelperTop" Height="20" VerticalAlignment="Top"
+            <DataGrid Name="ReqHelperTop" Height="15" VerticalAlignment="Top"
                       HeadersVisibility="None" VerticalScrollBarVisibility="Disabled"
                       CanUserAddRows="False" IsReadOnly="True"/>
             
             <DataGrid Name="RequirementsDataGrid" Grid.Column="1"  CanUserSortColumns="False"
-                  Margin="0 20" AutoGenerateColumns="False" HeadersVisibility="Column"
+                  Margin="0 16" AutoGenerateColumns="False" HeadersVisibility="Column"
                   ScrollViewer.ScrollChanged="RequirementsDataGrid_ScrollChanged"
                       LayoutUpdated="RequirementsDataGrid_LayoutUpdated">
                 <DataGrid.RowStyle>
@@ -54,7 +54,7 @@
                 </DataGrid.RowStyle>
             </DataGrid>
             
-            <DataGrid Name="ReqHelperBottom" Height="20" VerticalAlignment="Bottom"
+            <DataGrid Name="ReqHelperBottom" Height="15" VerticalAlignment="Bottom"
                       HeadersVisibility="None" VerticalScrollBarVisibility="Disabled"
                       CanUserAddRows="False" IsReadOnly="True"/>
         </Grid>

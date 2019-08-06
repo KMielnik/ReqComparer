@@ -90,6 +90,8 @@ namespace VisualComparer
         {
             RequirementsDataGrid.CanUserResizeRows = false;
             RequirementsDataGrid.RowHeight = 24;
+            ReqHelperTop.RowHeight = 15;
+            ReqHelperBottom.RowHeight = 15;
 
             reqsCollection.Clear();
             foreach (var req in basicReqs)
@@ -220,6 +222,11 @@ namespace VisualComparer
                 };
                 dataTrigger.Setters.Add(new Setter()
                 {
+                    Property = BorderBrushProperty,
+                    Value = brushes[actualBrush % brushes.Length]
+                });
+                dataTrigger.Setters.Add(new Setter()
+                {
                     Property = BackgroundProperty,
                     Value = brushes[actualBrush++ % brushes.Length]
                 });
@@ -254,9 +261,9 @@ namespace VisualComparer
                 var lastOccurence = reqsCollection.Count() - reqsCollection
                     .Reverse()
                     .TakeWhile(x => x.TCCovered[TCSelected.ToString()] != true)
-                    .Count() + 5;
+                    .Count();
 
-                if (firstOccurence > lastRow)
+                if (lastOccurence > lastRow)
                     ReqBottomHelperData[0][TCSelected.ToString()] = true;
                 else
                     ReqBottomHelperData[0][TCSelected.ToString()] = false;
