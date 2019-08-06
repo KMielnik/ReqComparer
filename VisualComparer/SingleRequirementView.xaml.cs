@@ -89,7 +89,7 @@ namespace VisualComparer
         private void SetReqDataGrid()
         {
             RequirementsDataGrid.CanUserResizeRows = false;
-            RequirementsDataGrid.RowHeight = 24;
+            RequirementsDataGrid.RowHeight = 20;
             ReqHelperTop.RowHeight = 15;
             ReqHelperBottom.RowHeight = 15;
 
@@ -223,7 +223,7 @@ namespace VisualComparer
                 dataTrigger.Setters.Add(new Setter()
                 {
                     Property = BorderBrushProperty,
-                    Value = brushes[actualBrush % brushes.Length]
+                    Value = Brushes.Black
                 });
                 dataTrigger.Setters.Add(new Setter()
                 {
