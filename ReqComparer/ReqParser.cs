@@ -36,7 +36,7 @@ namespace ReqComparer
 
             var minimalMargin = divs
                 .Select(x =>
-                    int.Parse(x.GetAttributeValue("style", "-1")
+                    int.Parse(x.GetAttributeValue("style", "0")
                         .Replace("margin-left:", "")
                         .Replace("px", "")))
                 .Min();
@@ -62,7 +62,7 @@ namespace ReqComparer
                         ?.Trim();
 
                     var margin = int.Parse(x
-                        .GetAttributeValue("style", "-1")
+                        .GetAttributeValue("style", "0")
                         .Replace("margin-left: ", "")
                         .Replace("px", ""));
 
@@ -75,14 +75,6 @@ namespace ReqComparer
                         .Trim()
                         .Split('\t')
                         .Where(y => !string.IsNullOrWhiteSpace(y))
-                        .Where(y =>
-                        {
-                            var validFromTo = Regex.Match(y, @"\[.*\]");
-                            if (validFromTo.Success == false)
-                                return true;
-
-                            return validFromTo.Value.Contains('-');
-                        })
                         .Select(y =>
                         {
                             var id = Regex.Replace(y, @"^[0-9]\) ", "");
@@ -90,7 +82,27 @@ namespace ReqComparer
 
                             var tcText = Regex.Match(y, "TC.*").Value;
 
-                            return (id, tcText);
+                            string ValidFrom, ValidTo;
+                            var validFromTo = Regex.Match(y, @"\[[0-9./-]+\]");
+                            Console.WriteLine(validFromTo.Value);
+                            if (validFromTo.Success == false)
+                            {
+                                ValidFrom = "-";
+                                ValidTo = "-";
+                            }
+                            else
+                            {
+                                var ValidFromToValues = validFromTo
+                                    .Value
+                                    .Replace("[", "")
+                                    .Replace("]", "")
+                                    .Split('/');
+
+                                ValidFrom = ValidFromToValues[0];
+                                ValidTo = ValidFromToValues[1];
+                            }
+
+                            return new TestCase(id, tcText, (ValidFrom, ValidTo));
                         })
                         .ToList();
 

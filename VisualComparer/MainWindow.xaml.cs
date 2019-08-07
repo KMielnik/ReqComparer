@@ -36,12 +36,11 @@ namespace VisualComparer
 
         private async Task LoadReqsFromFile(string filename)
         {
+                await parser.LoadFromFile(filename);
+                var reqs = parser.GetRequiermentsList();
 
-            await parser.LoadFromFile(filename);
-            var reqs = parser.GetRequiermentsList();
-
-            reqsCollection.Clear();
-            reqs.ForEach(x => reqsCollection.Add(x));
+                reqsCollection.Clear();
+                reqs.ForEach(x => reqsCollection.Add(x));
         }
 
         private async void ShowButton_Click(object sender, RoutedEventArgs e)
@@ -74,6 +73,8 @@ namespace VisualComparer
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files[0].Contains(".htm"))
                 await LoadReqsFromFile(files[0]);
+            else
+                MessageBox.Show("Invalid file format.\nTry with .htm next time.");
         }
     }
 }

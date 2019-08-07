@@ -38,6 +38,20 @@
                         </Style>
                     </ListBox.Resources>
                 </ListBox>
+                <ComboBox Name="ValidIn" Margin="10"
+                          SelectionChanged="ValidFrom_SelectionChanged">
+                    <ComboBoxItem Content="-"/>
+                    <ComboBoxItem Content="16.1"/>
+                    <ComboBoxItem Content="16.2"/>
+                    <ComboBoxItem Content="18.1"/>
+                    <ComboBoxItem Content="18.2"/>
+                    <ComboBoxItem Content="19.1"/>
+                    <ComboBoxItem Content="19.2"/>
+                    <ComboBoxItem Content="20.1"/>
+                    <ComboBoxItem Content="20.2"/>
+                    <ComboBoxItem Content="21.1"/>
+                    <ComboBoxItem Content="21.2"/>
+                </ComboBox>
             </StackPanel>
         </ScrollViewer>
         <Grid Grid.Column="1" Margin="10">

@@ -21,7 +21,7 @@ namespace VisualComparer
             Text = req.Text;
             FVariants = req.FVariants;
             Level = req.Level;
-            TCIDs = new List<string>(req.TCIDs);
+            TCs = new List<TestCase>(req.TCs);
 
             TCCovered = new Dictionary<string, bool>();
         }

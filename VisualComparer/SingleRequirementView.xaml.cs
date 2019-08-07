@@ -16,7 +16,8 @@ namespace VisualComparer
     {
         public ObservableCollection<RequirementSingleView> reqsCollection { get; set; }
         private ObservableCollection<ReqComparer.Requirement> basicReqs;
-        private ObservableCollection<int> AllTCs;
+        private ObservableCollection<int> FilteredTCs;
+        private ObservableCollection<ReqComparer.TestCase> AllTCs;
         private ObservableCollection<Dictionary<string,bool>> ReqTopHelperData;
         private ObservableCollection<Dictionary<string,bool>> ReqBottomHelperData;
 
@@ -33,12 +34,17 @@ namespace VisualComparer
         {
             InitializeComponent();
             reqsCollection = new ObservableCollection<RequirementSingleView>();
-            AllTCs = new ObservableCollection<int>();
+            FilteredTCs = new ObservableCollection<int>();
+            AllTCs = new ObservableCollection<ReqComparer.TestCase>();
+            AllTCs.CollectionChanged += AllTCs_CollectionChanged;
+
+            ValidIn.SelectedItem = "-";
+
             this.basicReqs = basicReqs;
             this.basicReqs.CollectionChanged += BasicReqs_CollectionChanged;
 
             RequirementsDataGrid.ItemsSource = reqsCollection;
-            AllTCsListBox.ItemsSource = AllTCs;
+            AllTCsListBox.ItemsSource = FilteredTCs;
 
             ReqTopHelperData = new ObservableCollection<Dictionary<string, bool>>();
             ReqBottomHelperData = new ObservableCollection<Dictionary<string, bool>>();
@@ -49,6 +55,23 @@ namespace VisualComparer
 
             SetReqDataGrid();
             setBoldDataTrigger(RequirementsDataGrid);
+        }
+
+        private void RefreshFilteredTCs()
+        {
+            var ValidInVersion = (ValidIn.SelectedItem as ComboBoxItem)?.Content.ToString();
+            Console.WriteLine(ValidInVersion);
+            FilteredTCs.Clear();
+            foreach (var TC in AllTCs)
+            {
+                if (TC.IsValidInSpecifiedVersion(ValidInVersion))
+                    FilteredTCs.Add(TC.IDValue);
+            }
+        }
+
+        private void AllTCs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            RefreshFilteredTCs();
         }
 
         private void RefreshRequirementsDataGrid()
@@ -97,17 +120,18 @@ namespace VisualComparer
             foreach (var req in basicReqs)
                 reqsCollection.Add(new RequirementSingleView(req));
 
+            FilteredTCs.Clear();
             AllTCs.Clear();
 
             reqsCollection
-                .SelectMany(x => x.TCIDsValue)
+                .SelectMany(x => x.TCs)
                 .Distinct()
-                .OrderBy(x => x)
+                .OrderBy(x => x.IDValue)
                 .ToList()
                 .ForEach(x => AllTCs.Add(x));
 
             foreach (var req in reqsCollection)
-                req.SetCoveredTCs(AllTCs);
+                req.SetCoveredTCs(FilteredTCs);
 
             RefreshRequirementsDataGrid();
             SetReqHelpersColumns();
@@ -141,7 +165,7 @@ namespace VisualComparer
 
             int actualBrush = 0;
             
-            foreach(var TCSelected in AllTCsListBox.SelectedItems)
+            foreach(int TCSelected in AllTCsListBox.SelectedItems)
             {
                 DataGridTextColumn TCColumn = new DataGridTextColumn
                 {
@@ -280,6 +304,11 @@ namespace VisualComparer
                 ReqHelperTop.Columns[i].Width = RequirementsDataGrid.Columns[i].Width;
                 ReqHelperBottom.Columns[i].Width = RequirementsDataGrid.Columns[i].Width;
             }
+        }
+
+        private void ValidFrom_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RefreshFilteredTCs();
         }
     }
 }
