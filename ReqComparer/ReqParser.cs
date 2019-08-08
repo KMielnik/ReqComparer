@@ -18,12 +18,11 @@ namespace ReqComparer
             => await Task.Run(() =>
                 {
                     string text = File.ReadAllText(filename);
-                    text = text.Replace("<br>", "\t");                  
-                    File.WriteAllText("m"+filename, text);
+                    text = text.Replace("<br>", "\t");
+                    File.WriteAllText(filename + ".tmp", text);
 
-                    document.Load("m"+filename);
+                    document.Load(filename + ".tmp");
                 });
-        
 
         public List<Requirement> GetRequiermentsList()
         {
@@ -36,7 +35,7 @@ namespace ReqComparer
 
             var minimalMargin = divs
                 .Select(x =>
-                    int.Parse(x.GetAttributeValue("style", "-1")
+                    int.Parse(x.GetAttributeValue("style", "0")
                         .Replace("margin-left:", "")
                         .Replace("px", "")))
                 .Min();
@@ -62,7 +61,7 @@ namespace ReqComparer
                         ?.Trim();
 
                     var margin = int.Parse(x
-                        .GetAttributeValue("style", "-1")
+                        .GetAttributeValue("style", "0")
                         .Replace("margin-left: ", "")
                         .Replace("px", ""));
 
@@ -74,15 +73,7 @@ namespace ReqComparer
                         .Replace("TC ID & Title:", "")
                         .Trim()
                         .Split('\t')
-                        .Where(z => !string.IsNullOrWhiteSpace(z))
-                        .Where(y =>
-                        {
-                            var validFromTo = Regex.Match(y, @"\[.*\]");
-                            if (validFromTo.Success == false)
-                                return true;
-
-                            return validFromTo.Value.Contains('-');
-                        })
+                        .Where(y => !string.IsNullOrWhiteSpace(y))
                         .Select(y =>
                         {
                             var id = Regex.Replace(y, @"^[0-9]\) ", "");
@@ -90,7 +81,27 @@ namespace ReqComparer
 
                             var tcText = Regex.Match(y, "TC.*").Value;
 
-                            return (id, tcText);
+                            string ValidFrom, ValidTo;
+                            var validFromTo = Regex.Match(y, @"\[[0-9./-]+\]");
+                            Console.WriteLine(validFromTo.Value);
+                            if (validFromTo.Success == false)
+                            {
+                                ValidFrom = "-";
+                                ValidTo = "-";
+                            }
+                            else
+                            {
+                                var ValidFromToValues = validFromTo
+                                    .Value
+                                    .Replace("[", "")
+                                    .Replace("]", "")
+                                    .Split('/');
+
+                                ValidFrom = ValidFromToValues[0];
+                                ValidTo = ValidFromToValues[1];
+                            }
+
+                            return new TestCase(id, tcText, (ValidFrom, ValidTo));
                         })
                         .ToList();
 
