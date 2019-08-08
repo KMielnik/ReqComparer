@@ -23,7 +23,6 @@ namespace ReqComparer
 
                     document.Load(filename + ".tmp");
                 });
-        
 
         public List<Requirement> GetRequiermentsList()
         {
