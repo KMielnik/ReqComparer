@@ -57,6 +57,7 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="ListWithNotifications.cs" />
     <Compile Include="RequirementDoubleView.cs" />
     <Compile Include="RequirementSingleView.cs" />
     <Compile Include="SingleRequirementView.xaml.cs">

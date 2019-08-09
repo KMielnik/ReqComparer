@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,7 +16,7 @@ namespace VisualComparer
     public partial class SingleRequirementView : UserControl
     {
         public ObservableCollection<RequirementSingleView> reqsCollection { get; set; }
-        private ObservableCollection<ReqComparer.Requirement> basicReqs;
+        private ListWithNotifications<ReqComparer.Requirement> basicReqs;
         private ObservableCollection<int> FilteredTCs;
         private ObservableCollection<ReqComparer.TestCase> AllTCs;
         private ObservableCollection<Dictionary<string,bool>> ReqTopHelperData;
@@ -30,13 +31,12 @@ namespace VisualComparer
             Brushes.Navy
         };
 
-        public SingleRequirementView(ObservableCollection<ReqComparer.Requirement> basicReqs)
+        public SingleRequirementView(ListWithNotifications<ReqComparer.Requirement> basicReqs)
         {
             InitializeComponent();
             reqsCollection = new ObservableCollection<RequirementSingleView>();
             FilteredTCs = new ObservableCollection<int>();
             AllTCs = new ObservableCollection<ReqComparer.TestCase>();
-            AllTCs.CollectionChanged += AllTCs_CollectionChanged;
 
             ValidIn.SelectedItem = "-";
 
@@ -53,25 +53,18 @@ namespace VisualComparer
             ReqHelperTop.ItemsSource = ReqTopHelperData;
             ReqHelperBottom.ItemsSource = ReqBottomHelperData;
 
-            SetReqDataGrid();
             setBoldDataTrigger(RequirementsDataGrid);
         }
 
         private void RefreshFilteredTCs()
         {
             var ValidInVersion = (ValidIn.SelectedItem as ComboBoxItem)?.Content.ToString();
-            Console.WriteLine(ValidInVersion);
             FilteredTCs.Clear();
             foreach (var TC in AllTCs)
             {
                 if (TC.IsValidInSpecifiedVersion(ValidInVersion))
                     FilteredTCs.Add(TC.IDValue);
             }
-        }
-
-        private void AllTCs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            RefreshFilteredTCs();
         }
 
         private void RefreshRequirementsDataGrid()
@@ -95,13 +88,6 @@ namespace VisualComparer
 
             RequirementsDataGrid.Columns.Add(new DataGridTextColumn
             {
-                Header = "TCs",
-                Binding = new Binding(nameof(RequirementDoubleView.TCStringified)),
-                IsReadOnly = true
-            });
-
-            RequirementsDataGrid.Columns.Add(new DataGridTextColumn
-            {
                 Header = "Functional Variants",
                 Binding = new Binding(nameof(RequirementDoubleView.FVariants)),
                 IsReadOnly = true,
@@ -109,12 +95,13 @@ namespace VisualComparer
             });
         }
 
-        private void SetReqDataGrid()
+        private async Task SetReqDataGrid()
         {
             RequirementsDataGrid.CanUserResizeRows = false;
             RequirementsDataGrid.RowHeight = 20;
             ReqHelperTop.RowHeight = 15;
             ReqHelperBottom.RowHeight = 15;
+
 
             reqsCollection.Clear();
             foreach (var req in basicReqs)
@@ -123,23 +110,33 @@ namespace VisualComparer
             FilteredTCs.Clear();
             AllTCs.Clear();
 
-            reqsCollection
+            var TCParseTask = Task.Run(() =>
+            {
+                reqsCollection
                 .SelectMany(x => x.TCs)
                 .Distinct()
                 .OrderBy(x => x.IDValue)
                 .ToList()
                 .ForEach(x => AllTCs.Add(x));
 
-            foreach (var req in reqsCollection)
-                req.SetCoveredTCs(FilteredTCs);
+                var allTCsValues = AllTCs.Select(x => x.IDValue);
+
+                reqsCollection
+                    .AsParallel()
+                    .ForAll(x => x.SetCoveredTCs(allTCsValues));
+            });
+
 
             RefreshRequirementsDataGrid();
             SetReqHelpersColumns();
+
+            await TCParseTask;
+            RefreshFilteredTCs();
         }
 
-        private void BasicReqs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private async void BasicReqs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            SetReqDataGrid();
+            await SetReqDataGrid();
         }
 
         private void setBoldDataTrigger(DataGrid datagrid)
@@ -171,6 +168,7 @@ namespace VisualComparer
                 {
                     Header = TCSelected.ToString()
                 };
+
 
                 var dataTrigger = new DataTrigger()
                 {
@@ -270,27 +268,29 @@ namespace VisualComparer
             var firstRow = e.VerticalOffset;
             var lastRow = firstRow + (int)(datagridHeight / rowHeight) - 1;
 
-            foreach (var TCSelected in AllTCsListBox.SelectedItems)
+            foreach (int TCSelected in AllTCsListBox.SelectedItems)
             {
+                var TCSelectedString = TCSelected.ToString();
+
                 var firstOccurence = reqsCollection
-                    .TakeWhile(x => x.TCCovered[TCSelected.ToString()] != true)
+                    .TakeWhile(x => x.TCCovered[TCSelected] != true)
                     .Count();
 
                 if (firstOccurence < firstRow)
-                    ReqTopHelperData[0][TCSelected.ToString()] = true;
+                    ReqTopHelperData[0][TCSelectedString] = true;
                 else
-                    ReqTopHelperData[0][TCSelected.ToString()] = false;
+                    ReqTopHelperData[0][TCSelectedString] = false;
 
 
                 var lastOccurence = reqsCollection.Count() - reqsCollection
                     .Reverse()
-                    .TakeWhile(x => x.TCCovered[TCSelected.ToString()] != true)
+                    .TakeWhile(x => x.TCCovered[TCSelected] != true)
                     .Count();
 
                 if (lastOccurence > lastRow)
-                    ReqBottomHelperData[0][TCSelected.ToString()] = true;
+                    ReqBottomHelperData[0][TCSelectedString] = true;
                 else
-                    ReqBottomHelperData[0][TCSelected.ToString()] = false;
+                    ReqBottomHelperData[0][TCSelectedString] = false;
             }
 
             ReqHelperTop.Items.Refresh();

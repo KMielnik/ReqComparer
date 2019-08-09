@@ -6,24 +6,18 @@ namespace VisualComparer
 {
     public class RequirementSingleView : Requirement
     {
-        public Dictionary<string, bool> TCCovered { get; set; }
+        public Dictionary<int, bool> TCCovered { get; set; }
 
         public void SetCoveredTCs(IEnumerable<int> allTCs)
         {
             TCCovered.Clear();
             foreach(var TC in allTCs)
-                TCCovered.Add(TC.ToString(), TCIDsValue.Contains(TC));
+                TCCovered.Add(TC, TCIDsValue.Contains(TC));
         }
 
-        public RequirementSingleView(Requirement req)
+        public RequirementSingleView(Requirement req) : base(req.ID, req.Text, req.Level, req.TCs, req.FVariants)
         {
-            ID = req.ID;
-            Text = req.Text;
-            FVariants = req.FVariants;
-            Level = req.Level;
-            TCs = new List<TestCase>(req.TCs);
-
-            TCCovered = new Dictionary<string, bool>();
+            TCCovered = new Dictionary<int, bool>();
         }
     }
 }

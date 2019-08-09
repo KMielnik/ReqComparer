@@ -11,13 +11,8 @@ namespace VisualComparer
     {
         public bool HighlightedRowRight { get; set; }
         public bool HighlightedRowLeft { get; set; }
-        public RequirementDoubleView(Requirement req)
+        public RequirementDoubleView(Requirement req) : base(req.ID, req.Text, req.Level, req.TCs, req.FVariants)
         {
-            ID = req.ID;
-            Text = req.Text;
-            FVariants = req.FVariants;
-            Level = req.Level;
-            TCs = new List<TestCase>(req.TCs); 
         }
     }
 }

@@ -23,29 +23,33 @@ namespace VisualComparer
     public partial class MainWindow : Window
     {
         readonly ReqParser parser;
-        public ObservableCollection<Requirement> reqsCollection { get; set; }
+        public ListWithNotifications<Requirement> reqsCollection { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             parser = new ReqParser();
-            reqsCollection = new ObservableCollection<Requirement>();
+            reqsCollection = new ListWithNotifications<Requirement>();
 
             RequirementsArea.Content = new SingleRequirementView(reqsCollection);
         }
 
         private async Task LoadReqsFromFile(string filename)
         {
-                await parser.LoadFromFile(filename);
-                var reqs = parser.GetRequiermentsList();
+            await parser.LoadFromFile(filename);
+            var reqs = parser.GetRequiermentsList();
 
-                reqsCollection.Clear();
-                reqs.ForEach(x => reqsCollection.Add(x));
+            reqsCollection.Clear();
+            reqsCollection.AddRangeNotifyFinish(reqs);
         }
 
         private async void ShowButton_Click(object sender, RoutedEventArgs e)
         {
-            await LoadReqsFromFile("d.htm");
+            //await LoadReqsFromFile("d.htm");
+            var reqs = await parser.GetReqsFromCachedFile();
+
+            reqsCollection.Clear();
+            reqsCollection.AddRangeNotifyFinish(reqs);
         }
 
         private void SwitchViewButton_Click(object sender, RoutedEventArgs e)
