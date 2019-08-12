@@ -12,9 +12,9 @@ namespace VisualComparer
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        public void AddRangeNotifyFinish(IEnumerable<T> items)
+        public async Task AddRangeNotifyFinishAsync(IEnumerable<T> items)
         {
-            AddRange(items);
+            await Task.Run(() => AddRange(items));
             CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }

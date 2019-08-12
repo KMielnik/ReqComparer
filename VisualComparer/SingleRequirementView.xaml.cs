@@ -118,8 +118,13 @@ namespace VisualComparer
 
 
             reqsCollection.Clear();
-            foreach (var req in basicReqs)
-                reqsCollection.Add(new RequirementSingleView(req));
+
+            basicReqs
+                .AsParallel()
+                .AsOrdered()
+                .Select(x=> new RequirementSingleView(x))
+                .ToList()
+                .ForEach(x => reqsCollection.Add(new RequirementSingleView(x)));
 
             FilteredTCs.Clear();
             AllTCs.Clear();
@@ -127,6 +132,7 @@ namespace VisualComparer
             var TCParseTask = Task.Run(() =>
             {
                 reqsCollection
+                .AsParallel()
                 .SelectMany(x => x.TCs)
                 .Distinct()
                 .OrderBy(x => x.IDValue)
@@ -258,7 +264,6 @@ namespace VisualComparer
                 ReqHelperTop.Columns.Add(new DataGridTextColumn
                 {
                     Header = column.Header,
-                    Binding = new Binding("[" + column.Header + "]"),
                     Width = column.ActualWidth,
                     IsReadOnly = true
                 });

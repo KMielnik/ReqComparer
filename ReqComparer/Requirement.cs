@@ -51,13 +51,14 @@ namespace ReqComparer
     {
         public string ID { get; protected set; }
         [JsonIgnore]
-        public int IDValue { get => int.Parse(ID); }
+        public int IDValue { get; set; }
         public string Text { get; set; }
         public string ValidFrom { get; set; }
         public string ValidTo { get; set; }
         public TestCase(string ID, string Text, (string From, string To) Valid)
         {
             this.ID = ID;
+            IDValue = int.Parse(ID);
             this.Text = Text;
             this.ValidFrom = Valid.From;
             this.ValidTo = Valid.To;

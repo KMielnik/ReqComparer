@@ -40,7 +40,7 @@ namespace VisualComparer
             var reqs = parser.GetRequiermentsList();
 
             reqsCollection.Clear();
-            reqsCollection.AddRangeNotifyFinish(reqs);
+            await reqsCollection.AddRangeNotifyFinishAsync(reqs);
         }
 
         private async void ShowButton_Click(object sender, RoutedEventArgs e)
@@ -49,7 +49,7 @@ namespace VisualComparer
             var reqs = await parser.GetReqsFromCachedFile();
 
             reqsCollection.Clear();
-            reqsCollection.AddRangeNotifyFinish(reqs);
+            await reqsCollection.AddRangeNotifyFinishAsync(reqs);
         }
 
         private void SwitchViewButton_Click(object sender, RoutedEventArgs e)
