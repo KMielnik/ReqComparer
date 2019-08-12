@@ -106,7 +106,9 @@ namespace ReqComparer
                                     .Value
                                     .Replace("[", "")
                                     .Replace("]", "")
-                                    .Split('/');
+                                    .Split('/')
+                                    .Select(z => z == "" ? "-" : z)
+                                    .ToArray();
 
                                 if (ValidFromToValues.Length >= 2)
                                 {
@@ -162,7 +164,7 @@ namespace ReqComparer
         {
             var filename = "cached_reqs_.json";
             var json = File.ReadAllText(filename);
-            return JsonConvert.DeserializeObject<List<Requirement>>(json);
+            return await Task.FromResult(JsonConvert.DeserializeObject<List<Requirement>>(json));
         }
 
         public string GetRequiermentsString()

@@ -7,6 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Input;
+using System.ComponentModel;
 
 namespace VisualComparer
 {
@@ -21,6 +23,8 @@ namespace VisualComparer
         private ObservableCollection<ReqComparer.TestCase> AllTCs;
         private ObservableCollection<Dictionary<string,bool>> ReqTopHelperData;
         private ObservableCollection<Dictionary<string,bool>> ReqBottomHelperData;
+
+        private ICollectionView TCView;
 
         private Brush[] brushes = {
             Brushes.Red,
@@ -45,6 +49,16 @@ namespace VisualComparer
 
             RequirementsDataGrid.ItemsSource = reqsCollection;
             AllTCsListBox.ItemsSource = FilteredTCs;
+            TCView = CollectionViewSource.GetDefaultView(FilteredTCs);
+            TCView.Filter = x =>
+            {
+                if (AllTCsListBox.SelectedItems.Contains(x))
+                    return true;
+                if (string.IsNullOrEmpty(TCFilter.Text))
+                    return true;
+
+                return x.ToString().Contains(TCFilter.Text);
+            };
 
             ReqTopHelperData = new ObservableCollection<Dictionary<string, bool>>();
             ReqBottomHelperData = new ObservableCollection<Dictionary<string, bool>>();
@@ -166,7 +180,7 @@ namespace VisualComparer
             {
                 DataGridTextColumn TCColumn = new DataGridTextColumn
                 {
-                    Header = TCSelected.ToString()
+                    Header = TCSelected
                 };
 
 
@@ -197,10 +211,36 @@ namespace VisualComparer
                 TCColumn.CellStyle = new Style();
                 TCColumn.CellStyle.Triggers.Add(dataTrigger);
 
+                TCColumn.HeaderStyle = new Style();
+
+                TCColumn.HeaderStyle.Setters.Add(new EventSetter()
+                {
+                    Event = MouseDoubleClickEvent,
+                    Handler = new MouseButtonEventHandler(Helper_DoubleClickEvent)
+                });
+
                 RequirementsDataGrid.Columns.Add(TCColumn);
             }
 
             SetReqHelpersColumns();
+        }
+
+        private void Helper_DoubleClickEvent(object sender, MouseButtonEventArgs e)
+        {
+            var header = (System.Windows.Controls.Primitives.DataGridColumnHeader)sender;
+
+            var firstOccurence = reqsCollection
+                    .TakeWhile(x => x.TCCovered[(int)header.Content] != true)
+                    .Count();
+
+            var lastOccurence = reqsCollection.Count() - reqsCollection
+                   .Reverse()
+                   .TakeWhile(x => x.TCCovered[(int)header.Content] != true)
+                   .Count();
+
+            RequirementsDataGrid.ScrollIntoView(RequirementsDataGrid.Items[lastOccurence]);
+
+            RequirementsDataGrid.ScrollIntoView(RequirementsDataGrid.Items[firstOccurence]);
         }
 
         private void SetReqHelpersColumns()
@@ -309,6 +349,11 @@ namespace VisualComparer
         private void ValidFrom_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             RefreshFilteredTCs();
+        }
+
+        private void TCFilter_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(FilteredTCs).Refresh();
         }
     }
 }
