@@ -9,18 +9,18 @@
     <Grid Drop="Grid_Drop" AllowDrop="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="12*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*" MinHeight="25" MaxHeight="50"/>
         </Grid.RowDefinitions>
         <ContentControl Grid.Row="0" x:Name="RequirementsArea"/>
         <Grid Grid.Row="1">
             <Button Name="ShowButton" Content="Show Default"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" Padding="10 2"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10 0" Padding="10 2"
                     Click="ShowButton_Click"/>
             <Button Content="Switch View"
-                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10" Padding="10 2"
+                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10 0" Padding="10 2"
                     Click="SwitchViewButton_Click"/>
             <StackPanel Orientation="Horizontal"
-                        Margin="20 10" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        Margin="20 0" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Button Content="Pick Export File" Click="FileSelector_Click"
                         Padding="10 2"/>
             </StackPanel>

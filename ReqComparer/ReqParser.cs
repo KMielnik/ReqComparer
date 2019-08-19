@@ -107,7 +107,7 @@ namespace ReqComparer
                                     .Replace("[", "")
                                     .Replace("]", "")
                                     .Split('/')
-                                    .Select(z => z == "" ? "-" : z)
+                                    .Select(z => z == "" || z == "." ? "-" : z)
                                     .ToArray();
 
                                 if (ValidFromToValues.Length >= 2)
@@ -134,12 +134,34 @@ namespace ReqComparer
                         .Replace("Functional Variants (use CTRL-R for edit):","")
                         .Trim();
 
+                    var typeString = reqStrings
+                        .Where(y => y.Contains("Object Type:"))
+                        .FirstOrDefault()
+                        .Replace("Object Type:", "")
+                        .Trim();
+
+                    var type = Requirement.Types.Req;
+
+                    switch(typeString)
+                    {
+                        case "Info":
+                            type = Requirement.Types.Info;
+                            break;
+                        case "Head":
+                            type = Requirement.Types.Head;
+                            break;
+                        case "Req":
+                            type = Requirement.Types.Req;
+                            break;
+                    }
+
                     return new Requirement(
                         ID,
                         text,
                         indentLevel,
                         TCs,
-                        fVariants);
+                        fVariants,
+                        type);
                 })
                 .ToList();
 
@@ -164,7 +186,7 @@ namespace ReqComparer
         {
             var filename = "cached_reqs_.json";
             var json = File.ReadAllText(filename);
-            return await Task.FromResult(JsonConvert.DeserializeObject<List<Requirement>>(json));
+            return await Task.Run(() => JsonConvert.DeserializeObject<List<Requirement>>(json));
         }
 
         public string GetRequiermentsString()

@@ -11,6 +11,7 @@ namespace ReqComparer
         [JsonIgnore]
         public int IDValue { get; private set; }
         public string Text { get; protected set; }
+        public Types Type { get; protected set; }
         [JsonIgnore]
         public string TextIntended { get; private set; }
         public string FVariants { get; set; }
@@ -23,7 +24,14 @@ namespace ReqComparer
         [JsonIgnore]
         public bool IsImportant { get; private set; }
 
-        public Requirement(string iD, string text, int level, List<TestCase> TCs, string fVariants)
+        public enum Types
+        {
+            Head,
+            Req,
+            Info
+        }
+
+        public Requirement(string iD, string text, int level, List<TestCase> TCs, string fVariants, Types type)
         {
             ID = iD;
             IDValue = int.Parse(ID.Replace("PR_PH_", ""));
@@ -32,6 +40,8 @@ namespace ReqComparer
             TextIntended = new string(' ', Level * 3) + Text;
 
             FVariants = fVariants;
+
+            this.Type = type;
 
             this.TCs = new List<TestCase>();
 

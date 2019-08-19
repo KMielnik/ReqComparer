@@ -8,15 +8,17 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*" MaxWidth="150"/>
             <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="15*"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="All Test Cases" FontWeight="Bold"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -25,6 +27,8 @@
                 <ComboBoxItem Content="-"/>
                 <ComboBoxItem Content="16.1"/>
                 <ComboBoxItem Content="16.2"/>
+                <ComboBoxItem Content="17.1"/>
+                <ComboBoxItem Content="17.2"/>
                 <ComboBoxItem Content="18.1"/>
                 <ComboBoxItem Content="18.2"/>
                 <ComboBoxItem Content="19.1"/>
@@ -32,7 +36,6 @@
                 <ComboBoxItem Content="20.1"/>
                 <ComboBoxItem Content="20.2"/>
                 <ComboBoxItem Content="21.1"/>
-                <ComboBoxItem Content="21.2"/>
             </ComboBox>
             <TextBox Grid.Row="2" Name="TCFilter" Margin="5 2" TextChanged="TCFilter_TextChanged"/>
             <ListBox Grid.Row="3" Name="AllTCsListBox" Margin="10 5" 
@@ -40,7 +43,8 @@
                  SelectionMode="Multiple"
                  VirtualizingPanel.IsVirtualizing="True"
                  VirtualizingPanel.VirtualizationMode="Recycling" 
-                 SelectionChanged="AllTCsListBox_SelectionChanged">
+                 SelectionChanged="AllTCsListBox_SelectionChanged"
+                     LostFocus="AllTCsListBox_LostFocus">
                 <ListBox.Resources>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -48,16 +52,20 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
-                                    <CheckBox Margin="5,2"
+                                    <StackPanel Orientation="Vertical">
+                                        <CheckBox Margin="5,2"
                                           IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
-                                        <ContentPresenter/>
-                                    </CheckBox>
+                                            <ContentPresenter/>
+                                        </CheckBox>
+                                    </StackPanel>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
                 </ListBox.Resources>
             </ListBox>
+            <Button Grid.Row="4" Content="Clear Filters" Margin="5" Click="ClearFiltersButton_Click"/>
+            <Button Grid.Row="5" Content="Select Chapter" Margin="5" Click="ChapterSelectButton_Click"/>
         </Grid>
         <Grid Grid.Column="1" Margin="10">
             <DataGrid Name="ReqHelperTop" Height="16" VerticalAlignment="Top" FontSize="10"

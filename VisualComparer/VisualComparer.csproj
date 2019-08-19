@@ -63,6 +63,7 @@
     <Compile Include="SingleRequirementView.xaml.cs">
       <DependentUpon>SingleRequirementView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TestCaseConverter.cs" />
     <Page Include="DoubleRequirementView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
