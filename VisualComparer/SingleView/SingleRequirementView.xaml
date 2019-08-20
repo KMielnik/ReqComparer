@@ -44,7 +44,7 @@
                  VirtualizingPanel.IsVirtualizing="True"
                  VirtualizingPanel.VirtualizationMode="Recycling" 
                  SelectionChanged="AllTCsListBox_SelectionChanged"
-                     LostFocus="AllTCsListBox_LostFocus">
+                     MouseLeave="AllTCsListBox_LostFocus">
                 <ListBox.Resources>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="OverridesDefaultStyle" Value="true" />

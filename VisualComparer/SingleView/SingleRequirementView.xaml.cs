@@ -227,6 +227,7 @@ namespace VisualComparer
                     .Distinct()
                     .ToList()
                     .ForEach(x => AllTCsListBox.SelectedItems.Add(x));
+                PushSelectedTCsUp();
             }
 
             reqsCollection
@@ -468,24 +469,33 @@ namespace VisualComparer
         {
             CollectionViewSource.GetDefaultView(FilteredTCs).Refresh();
         }
-
-        private void AllTCsListBox_LostFocus(object sender, RoutedEventArgs e)
+        private void PushSelectedTCsUp()
         {
-            return;
+
             var selectedTcs = AllTCsListBox
                 .SelectedItems
                 .Cast<int>()
+                //.OrderByDescending(x => x)
                 .ToList();
 
             AllTCsListBox.SelectedItems.Clear();
+
+            var temp = TCFilter.Text;
+            TCFilter.Text = "";
+            RefreshFilteredTCs();
+
             selectedTcs.ForEach(x => FilteredTCs.Move(FilteredTCs.IndexOf(x), 0));
 
             selectedTcs.ForEach(x => AllTCsListBox.SelectedItems.Add(x));
+            TCFilter.Text = temp;
+        }
+        private void AllTCsListBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            PushSelectedTCsUp();
         }
 
         private void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
         {
-            ValidIn.SelectedIndex = 0;
             TCFilter.Text = "";
             AllTCsListBox.SelectedItems.Clear();
             ShowOneChapter(0);
