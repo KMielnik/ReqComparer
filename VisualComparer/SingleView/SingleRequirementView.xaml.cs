@@ -409,6 +409,9 @@ namespace VisualComparer
                     .IndexOf(reqsCollection
                         .Last(x => x.IsVisible == true));
 
+                if (lastVisible < lastRow)
+                    lastRow = lastVisible + 1;
+
                 if (e.VerticalChange < 0 && firstRow<firstVisible)
                 {
                     var scrollViewer = GetScrollViewer(RequirementsDataGrid);
@@ -463,6 +466,7 @@ namespace VisualComparer
         private void ValidFrom_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             RefreshFilteredTCs();
+            ShowOneChapter(0);
         }
 
         private void TCFilter_TextChanged(object sender, TextChangedEventArgs e)

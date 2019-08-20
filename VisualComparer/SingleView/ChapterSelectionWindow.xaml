@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualComparer"
-        mc:Ignorable="d" WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
         Title="Select Chapter" SizeToContent="Width"
         MinWidth="300" MinHeight="200" Height="300">
     <Window.Resources>
