@@ -80,5 +80,13 @@ namespace VisualComparer
             else
                 MessageBox.Show("Invalid file format.\nTry with .htm next time.");
         }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var reqs = await parser.GetReqsFromCachedFile();
+
+            reqsCollection.Clear();
+            await reqsCollection.AddRangeNotifyFinishAsync(reqs);
+        }
     }
 }

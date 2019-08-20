@@ -471,7 +471,6 @@ namespace VisualComparer
         }
         private void PushSelectedTCsUp()
         {
-
             var selectedTcs = AllTCsListBox
                 .SelectedItems
                 .Cast<int>()
