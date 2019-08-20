@@ -25,8 +25,6 @@ namespace VisualComparer
         private ObservableCollection<Dictionary<string,bool>> ReqTopHelperData;
         private ObservableCollection<Dictionary<string,bool>> ReqBottomHelperData;
 
-        private ICollectionView TCView;
-
         private Brush[] brushes = {
             Brushes.Red,
             Brushes.Blue,
@@ -51,7 +49,7 @@ namespace VisualComparer
 
             RequirementsDataGrid.ItemsSource = reqsCollection;
             AllTCsListBox.ItemsSource = FilteredTCs;
-            TCView = CollectionViewSource.GetDefaultView(FilteredTCs);
+            var TCView = CollectionViewSource.GetDefaultView(FilteredTCs);
             TCView.Filter = x =>
             {
                 if (AllTCsListBox.SelectedItems.Contains(x))
@@ -59,7 +57,7 @@ namespace VisualComparer
                 if (string.IsNullOrEmpty(TCFilter.Text))
                     return true;
 
-                return x.ToString().Contains(TCFilter.Text);
+                return x.ToString().StartsWith(TCFilter.Text);
             };
 
             ReqTopHelperData = new ObservableCollection<Dictionary<string, bool>>();
@@ -92,13 +90,6 @@ namespace VisualComparer
             {
                 Header = "ID",
                 Binding = new Binding(nameof(RequirementDoubleView.ID)),
-                IsReadOnly = true
-            });
-
-            RequirementsDataGrid.Columns.Add(new DataGridTextColumn
-            {
-                Header = "Level",
-                Binding = new Binding(nameof(RequirementDoubleView.Level)),
                 IsReadOnly = true
             });
 
@@ -197,7 +188,7 @@ namespace VisualComparer
             datagrid.RowStyle.Triggers.Add(dataTrigger);
         }
 
-        private void ShowOneChapter(int chapterID)
+        private void ShowOneChapter(int chapterID, bool showAllTCs = false)
         {
             foreach (var req in reqsCollection)
                 req.IsVisible = true;
@@ -227,6 +218,16 @@ namespace VisualComparer
                     .TakeWhile(x => x.Level > chapterLevel || x.IDValue == chapterID)
                     .ToList();
 
+            if(showAllTCs)
+            {
+                AllTCsListBox.SelectedItems.Clear();
+
+                chapterReqs
+                    .SelectMany(x => x.TCIDsValue)
+                    .Distinct()
+                    .ToList()
+                    .ForEach(x => AllTCsListBox.SelectedItems.Add(x));
+            }
 
             reqsCollection
                 .Except(chapterReqs)
@@ -249,7 +250,8 @@ namespace VisualComparer
             {
                 DataGridTextColumn TCColumn = new DataGridTextColumn
                 {
-                    Header = TCSelected
+                    Header = TCSelected,
+                    IsReadOnly = true
                 };
 
 
@@ -324,7 +326,7 @@ namespace VisualComparer
 
             int actualBrush = 0;
 
-            foreach (var column in RequirementsDataGrid.Columns)
+            foreach (var column in RequirementsDataGrid.Columns.OrderBy(x=>x.DisplayIndex))
             {
                 ReqHelperTop.Columns.Add(new DataGridTextColumn
                 {
@@ -376,21 +378,22 @@ namespace VisualComparer
 
             ScrollViewer retour = null;
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(element) && retour == null; i++)
-            {
                 if (VisualTreeHelper.GetChild(element, i) is ScrollViewer)
-                {
                     retour = (ScrollViewer)(VisualTreeHelper.GetChild(element, i));
-                }
                 else
-                {
                     retour = GetScrollViewer(VisualTreeHelper.GetChild(element, i) as UIElement);
-                }
-            }
+
             return retour;
         }
 
         private void RequirementsDataGrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
+            new List<ScrollViewer>()
+            {
+                GetScrollViewer(ReqHelperTop),
+                GetScrollViewer(ReqHelperBottom)
+            }.ForEach(x => x.ScrollToHorizontalOffset(e.HorizontalOffset));
+
             var datagridHeight = RequirementsDataGrid.ActualHeight;
             var rowHeight = RequirementsDataGrid.RowHeight;
             var firstRow = (int)e.VerticalOffset;
@@ -416,8 +419,6 @@ namespace VisualComparer
                     scrollViewer.ScrollToVerticalOffset(lastVisible);
                 }
                 RequirementsDataGrid.UpdateLayout();
-                e.Handled = true;
-                return;
             }
 
             foreach (int TCSelected in AllTCsListBox.SelectedItems)
@@ -492,14 +493,24 @@ namespace VisualComparer
 
         public void ChapterSelectButton_Click(object sender,RoutedEventArgs e)
         {
-            var allChapters = reqsCollection
-                .Where(x => x.Type == ReqComparer.Requirement.Types.Head)
-                .Select(x => Regex.Match(x.Text, @"^\d+\.+[\d.]+").Value)
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
+            var chapterSelectionWindow = new ChapterSelectionWindow(reqsCollection);
+            chapterSelectionWindow.ShowDialog();
+            if (chapterSelectionWindow.DialogResult == true)
+            {
+                var selectedChapter = chapterSelectionWindow.Answer;
+                Console.WriteLine(selectedChapter.chapter);
+                ShowOneChapter(selectedChapter.id, true);
+            }
+        }
+        private void RequirementsDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
+        {
+            ReqHelperTop.Columns
+                .First(x => x.Header.ToString() == e.Column.Header.ToString())
+                .DisplayIndex = e.Column.DisplayIndex;
 
-            ShowOneChapter(reqsCollection[RequirementsDataGrid.SelectedIndex].IDValue);
-            Console.WriteLine($"Done for {reqsCollection[RequirementsDataGrid.SelectedIndex].IDValue}");
+            ReqHelperBottom.Columns
+                .First(x => x.Header.ToString() == e.Column.Header.ToString())
+                .DisplayIndex = e.Column.DisplayIndex;
         }
     }
 }
