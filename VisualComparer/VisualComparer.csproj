@@ -57,14 +57,21 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="SingleView\ChapterSelectionWindow.xaml.cs">
+      <DependentUpon>ChapterSelectionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ListWithNotifications.cs" />
-    <Compile Include="RequirementDoubleView.cs" />
-    <Compile Include="RequirementSingleView.cs" />
-    <Compile Include="SingleRequirementView.xaml.cs">
+    <Compile Include="DoubleView\RequirementDoubleView.cs" />
+    <Compile Include="SingleView\RequirementSingleView.cs" />
+    <Compile Include="SingleView\SingleRequirementView.xaml.cs">
       <DependentUpon>SingleRequirementView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TestCaseConverter.cs" />
-    <Page Include="DoubleRequirementView.xaml">
+    <Compile Include="SingleView\TestCaseConverter.cs" />
+    <Page Include="SingleView\ChapterSelectionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DoubleView\DoubleRequirementView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -76,14 +83,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DoubleRequirementView.xaml.cs">
+    <Compile Include="DoubleView\DoubleRequirementView.xaml.cs">
       <DependentUpon>DoubleRequirementView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SingleRequirementView.xaml">
+    <Page Include="SingleView\SingleRequirementView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
