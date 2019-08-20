@@ -66,7 +66,8 @@
     <Compile Include="SingleView\SingleRequirementView.xaml.cs">
       <DependentUpon>SingleRequirementView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SingleView\TestCaseConverter.cs" />
+    <Compile Include="SingleView\Converters\TestCaseConverter.cs" />
+    <Compile Include="SingleView\Converters\TupleDisplayChapterConverter.cs" />
     <Page Include="SingleView\ChapterSelectionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

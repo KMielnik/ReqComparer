@@ -152,14 +152,32 @@ namespace VisualComparer
         private async void BasicReqs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             await SetReqDataGrid();
+            GetScrollViewer(RequirementsDataGrid)
+                .ScrollToVerticalOffset(reqsCollection.IndexOf(reqsCollection
+                    .Skip(1)
+                    .First(x => x.Type == ReqComparer.Requirement.Types.Head)));
         }
 
         private void setBoldDataTrigger(DataGrid datagrid)
         {
             var dataTrigger = new DataTrigger()
             {
-                Binding = new Binding(nameof(RequirementSingleView.IsImportant)),
-                Value = true
+                Binding = new Binding(nameof(RequirementSingleView.Type)),
+                Value = ReqComparer.Requirement.Types.Head
+            };
+
+            dataTrigger.Setters.Add(new Setter()
+            {
+                Property = FontWeightProperty,
+                Value = FontWeights.ExtraBold
+            });
+
+            datagrid.RowStyle.Triggers.Add(dataTrigger);
+
+            dataTrigger = new DataTrigger()
+            {
+                Binding = new Binding(nameof(RequirementSingleView.Type)),
+                Value = ReqComparer.Requirement.Types.Req
             };
 
             dataTrigger.Setters.Add(new Setter()
@@ -196,6 +214,7 @@ namespace VisualComparer
             if (chapterID == 0)
             {
                 RequirementsDataGrid.Items.Refresh();
+                ChapterNameTextBlock.Text = "-";
                 return;
             }
 
@@ -513,6 +532,7 @@ namespace VisualComparer
                 var selectedChapter = chapterSelectionWindow.Answer;
                 Console.WriteLine(selectedChapter.chapter);
                 ShowOneChapter(selectedChapter.id, true);
+                ChapterNameTextBlock.Text = selectedChapter.chapter;
             }
         }
         private void RequirementsDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
@@ -524,6 +544,11 @@ namespace VisualComparer
             ReqHelperBottom.Columns
                 .First(x => x.Header.ToString() == e.Column.Header.ToString())
                 .DisplayIndex = e.Column.DisplayIndex;
+        }
+
+        private void ChapterClear_Click(object sender, RoutedEventArgs e)
+        {
+            ShowOneChapter(0);
         }
     }
 }

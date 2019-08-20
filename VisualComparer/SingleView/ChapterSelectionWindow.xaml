@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualComparer"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="Select Chapter" SizeToContent="Width"
+        Title="Select Chapter" SizeToContent="Width" ContentRendered="Window_ContentRendered"
         MinWidth="300" MinHeight="200" Height="300">
     <Window.Resources>
         <local:TupleDisplayChapterConverter x:Key="converter"/>
@@ -33,7 +33,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Filter:" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBox Grid.Column="1" Margin="10 5" Name="ChapterFilterTextBox" TextChanged="TextBox_TextChanged"/>
+            <TextBox Grid.Column="1" Margin="10 5" Name="ChapterFilterTextBox" TextChanged="TextBox_TextChanged" VerticalAlignment="Center"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

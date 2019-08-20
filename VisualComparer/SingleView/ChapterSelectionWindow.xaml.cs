@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -74,22 +73,10 @@ namespace VisualComparer
         {
             CollectionViewSource.GetDefaultView(Reqs).Refresh();
         }
-    }
 
-    public class TupleDisplayChapterConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        private void Window_ContentRendered(object sender, EventArgs e)
         {
-            var tuple = value as (string chapter, int id)?;
-
-            if (tuple == null)
-                return null;
-            return tuple.Value.chapter;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
+            ChapterFilterTextBox.Focus();
         }
     }
 }
