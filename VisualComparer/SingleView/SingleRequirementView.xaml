@@ -20,7 +20,7 @@
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="62"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="All Test Cases" FontWeight="Bold"
+            <TextBlock Grid.Row="0" Text="Test Case Filters" FontWeight="Bold"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="1" Name="ValidIn" Margin="5 2"
                           SelectionChanged="ValidFrom_SelectionChanged">
@@ -65,7 +65,7 @@
                 </ListBox.Resources>
             </ListBox>
             <Button Grid.Row="4" Content="Clear Test Case Filters" Margin="5" Click="ClearFiltersButton_Click"/>
-            <Grid  Grid.Row="5" Margin="5">
+            <Grid  Grid.Row="5" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="1.5*"/>

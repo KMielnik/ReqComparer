@@ -22,8 +22,8 @@ namespace VisualComparer
         private ListWithNotifications<ReqComparer.Requirement> basicReqs;
         private ObservableCollection<int> FilteredTCs;
         private ObservableCollection<ReqComparer.TestCase> AllTCs;
-        private ObservableCollection<Dictionary<string,bool>> ReqTopHelperData;
-        private ObservableCollection<Dictionary<string,bool>> ReqBottomHelperData;
+        private ObservableCollection<Dictionary<string, bool>> ReqTopHelperData;
+        private ObservableCollection<Dictionary<string, bool>> ReqBottomHelperData;
 
         private Brush[] brushes = {
             Brushes.Red,
@@ -49,16 +49,7 @@ namespace VisualComparer
 
             RequirementsDataGrid.ItemsSource = reqsCollection;
             AllTCsListBox.ItemsSource = FilteredTCs;
-            var TCView = CollectionViewSource.GetDefaultView(FilteredTCs);
-            TCView.Filter = x =>
-            {
-                if (AllTCsListBox.SelectedItems.Contains(x))
-                    return true;
-                if (string.IsNullOrEmpty(TCFilter.Text))
-                    return true;
-
-                return x.ToString().StartsWith(TCFilter.Text);
-            };
+            SetTCListView();
 
             ReqTopHelperData = new ObservableCollection<Dictionary<string, bool>>();
             ReqBottomHelperData = new ObservableCollection<Dictionary<string, bool>>();
@@ -69,6 +60,20 @@ namespace VisualComparer
 
             setBoldDataTrigger(RequirementsDataGrid);
             setVisibilityDataTrigger(RequirementsDataGrid);
+        }
+
+        private void SetTCListView()
+        {
+            var TCView = CollectionViewSource.GetDefaultView(FilteredTCs);
+            TCView.Filter = x =>
+            {
+                if (AllTCsListBox.SelectedItems.Contains(x))
+                    return true;
+                if (string.IsNullOrEmpty(TCFilter.Text))
+                    return true;
+
+                return x.ToString().StartsWith(TCFilter.Text);
+            };
         }
 
         private void RefreshFilteredTCs()
@@ -123,7 +128,7 @@ namespace VisualComparer
             basicReqs
                 .AsParallel()
                 .AsOrdered()
-                .Select(x=> new RequirementSingleView(x))
+                .Select(x => new RequirementSingleView(x))
                 .ToList()
                 .ForEach(x => reqsCollection.Add(new RequirementSingleView(x)));
 
@@ -208,6 +213,7 @@ namespace VisualComparer
 
         private void ShowOneChapter(int chapterID, bool showAllTCs = false)
         {
+            TCFilter.Text = "";
             foreach (var req in reqsCollection)
                 req.IsVisible = true;
 
@@ -237,7 +243,7 @@ namespace VisualComparer
                     .TakeWhile(x => x.Level > chapterLevel || x.IDValue == chapterID)
                     .ToList();
 
-            if(showAllTCs)
+            if (showAllTCs)
             {
                 AllTCsListBox.SelectedItems.Clear();
 
@@ -258,6 +264,7 @@ namespace VisualComparer
             scrollViewer.ScrollToVerticalOffset(reqsCollection.IndexOf(firstChapterReq));
 
             RequirementsDataGrid.Items.Refresh();
+            RefreshHelpers();
         }
 
         private void AllTCsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -265,8 +272,8 @@ namespace VisualComparer
             RefreshRequirementsDataGrid();
 
             int actualBrush = 0;
-            
-            foreach(int TCSelected in AllTCsListBox.SelectedItems)
+
+            foreach (int TCSelected in AllTCsListBox.SelectedItems)
             {
                 DataGridTextColumn TCColumn = new DataGridTextColumn
                 {
@@ -310,10 +317,33 @@ namespace VisualComparer
                     Handler = new MouseButtonEventHandler(Helper_DoubleClickEvent)
                 });
 
+                TCColumn.HeaderStyle.Setters.Add(new EventSetter()
+                {
+                    Event = MouseRightButtonDownEvent,
+                    Handler = new MouseButtonEventHandler(Helper_RightClickEvent)
+                });
+
+                TCColumn.HeaderStyle.Setters.Add(new Setter()
+                {
+                    Property = ToolTipProperty,
+                    Value = AllTCs.First(x=>x.IDValue == TCSelected).Text
+                });
+
                 RequirementsDataGrid.Columns.Add(TCColumn);
             }
 
             SetReqHelpersColumns();
+        }
+
+        private void Helper_RightClickEvent(object sender, MouseButtonEventArgs e)
+        {
+            var TC = (int)(sender as System.Windows.Controls.Primitives.DataGridColumnHeader).Content;
+            RequirementsDataGrid.SelectedItems.Clear();
+            reqsCollection
+                .Where(x => x.TCIDsValue.Contains(TC))
+                .ToList()
+                .ForEach(x => RequirementsDataGrid.SelectedItems.Add(x));
+            RequirementsDataGrid.Focus();
         }
 
         private void Helper_DoubleClickEvent(object sender, MouseButtonEventArgs e)
@@ -346,7 +376,7 @@ namespace VisualComparer
 
             int actualBrush = 0;
 
-            foreach (var column in RequirementsDataGrid.Columns.OrderBy(x=>x.DisplayIndex))
+            foreach (var column in RequirementsDataGrid.Columns.OrderBy(x => x.DisplayIndex))
             {
                 ReqHelperTop.Columns.Add(new DataGridTextColumn
                 {
@@ -364,7 +394,7 @@ namespace VisualComparer
 
                 if (!int.TryParse(column.Header.ToString(), out _))
                     continue;
-                
+
                 ReqTopHelperData[0].Add(column.Header.ToString(), false);
                 ReqBottomHelperData[0].Add(column.Header.ToString(), false);
 
@@ -406,71 +436,95 @@ namespace VisualComparer
             return retour;
         }
 
-        private void RequirementsDataGrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        private void RefreshHelpers()
         {
-            new List<ScrollViewer>()
+            RefreshHelpers(true, true,
+                GetScrollViewer(RequirementsDataGrid).HorizontalOffset,
+                GetScrollViewer(RequirementsDataGrid).VerticalOffset);
+        }
+
+        private void RefreshHelpers(bool horizontalRefresh, bool verticalRefresh, double horizontalOffset, double verticalOffset, double verticalChange = 0)
+        {
+            if (horizontalRefresh)
             {
-                GetScrollViewer(ReqHelperTop),
-                GetScrollViewer(ReqHelperBottom)
-            }.ForEach(x => x.ScrollToHorizontalOffset(e.HorizontalOffset));
-
-            var datagridHeight = RequirementsDataGrid.ActualHeight;
-            var rowHeight = RequirementsDataGrid.RowHeight;
-            var firstRow = (int)e.VerticalOffset;
-            var lastRow = firstRow + (int)(datagridHeight / rowHeight) - 1;
-
-            if (reqsCollection.Any(x => x.IsVisible == false))
-            {
-                var firstVisible = reqsCollection
-                    .IndexOf(reqsCollection
-                        .First(x => x.IsVisible == true));
-                var lastVisible = reqsCollection
-                    .IndexOf(reqsCollection
-                        .Last(x => x.IsVisible == true));
-
-                if (lastVisible < lastRow)
-                    lastRow = lastVisible + 1;
-
-                if (e.VerticalChange < 0 && firstRow<firstVisible)
+                new List<ScrollViewer>()
                 {
-                    var scrollViewer = GetScrollViewer(RequirementsDataGrid);
-                    scrollViewer.ScrollToVerticalOffset(firstVisible);
-                }
-                else if (e.VerticalChange > 0 && lastVisible < firstRow)
-                {
-                    var scrollViewer = GetScrollViewer(RequirementsDataGrid);
-                    scrollViewer.ScrollToVerticalOffset(lastVisible);
-                }
-                RequirementsDataGrid.UpdateLayout();
+                    GetScrollViewer(ReqHelperTop),
+                    GetScrollViewer(ReqHelperBottom)
+                }.ForEach(x => x.ScrollToHorizontalOffset(horizontalOffset));
             }
 
-            foreach (int TCSelected in AllTCsListBox.SelectedItems)
+            if (verticalRefresh)
             {
-                var TCSelectedString = TCSelected.ToString();
+                var datagridHeight = RequirementsDataGrid.ActualHeight;
+                var rowHeight = RequirementsDataGrid.RowHeight;
+                var firstRow = (int)verticalOffset;
+                var lastRow = firstRow + (int)(datagridHeight / rowHeight) - 1;
 
-                var firstOccurence = reqsCollection
-                    .TakeWhile(x => x.TCIDsValue.Contains(TCSelected) != true)
-                    .Count();
+                if (reqsCollection.AsParallel().Any(x => x.IsVisible == false))
+                {
+                    var firstVisible = reqsCollection
+                        .IndexOf(reqsCollection
+                            .First(x => x.IsVisible == true));
+                    var lastVisible = reqsCollection
+                        .IndexOf(reqsCollection
+                            .Last(x => x.IsVisible == true));
 
-                if (firstOccurence < firstRow)
-                    ReqTopHelperData[0][TCSelectedString] = true;
-                else
-                    ReqTopHelperData[0][TCSelectedString] = false;
+                    if (lastVisible < lastRow)
+                        lastRow = lastVisible + 1;
+
+                    if (verticalChange < 0 && firstRow < firstVisible)
+                    {
+                        var scrollViewer = GetScrollViewer(RequirementsDataGrid);
+                        scrollViewer.ScrollToVerticalOffset(firstVisible);
+                    }
+                    else if (verticalChange > 0 && lastVisible < firstRow)
+                    {
+                        var scrollViewer = GetScrollViewer(RequirementsDataGrid);
+                        scrollViewer.ScrollToVerticalOffset(lastVisible);
+                    }
+                }
+
+                var selectedTCs = new List<int>();
+                foreach (int TC in AllTCsListBox.SelectedItems)
+                    selectedTCs.Add(TC);
 
 
-                var lastOccurence = reqsCollection.Count() - reqsCollection
-                    .Reverse()
-                    .TakeWhile(x => x.TCIDsValue.Contains(TCSelected) != true)
-                    .Count();
+                Parallel.ForEach(selectedTCs, TCSelected =>
+                {
+                    var TCSelectedString = TCSelected.ToString();
 
-                if (lastOccurence > lastRow)
-                    ReqBottomHelperData[0][TCSelectedString] = true;
-                else
-                    ReqBottomHelperData[0][TCSelectedString] = false;
+                    var firstOccurence = reqsCollection
+                        .TakeWhile(x => x.TCIDsValue.Contains(TCSelected) != true)
+                        .Count();
+
+                    if (firstOccurence < firstRow)
+                        ReqTopHelperData[0][TCSelectedString] = true;
+                    else
+                        ReqTopHelperData[0][TCSelectedString] = false;
+
+
+                    var lastOccurence = reqsCollection.Count() - reqsCollection
+                        .Reverse()
+                        .TakeWhile(x => x.TCIDsValue.Contains(TCSelected) != true)
+                        .Count();
+
+                    if (lastOccurence > lastRow)
+                        ReqBottomHelperData[0][TCSelectedString] = true;
+                    else
+                        ReqBottomHelperData[0][TCSelectedString] = false;
+                });
+
+
             }
-
+            RequirementsDataGrid.UpdateLayout();
             ReqHelperTop.Items.Refresh();
             ReqHelperBottom.Items.Refresh();
+        }
+
+        private void RequirementsDataGrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            RefreshHelpers(e.HorizontalChange != 0, e.VerticalChange != 0, e.HorizontalOffset, e.VerticalOffset, e.VerticalChange);
         }
 
         private void RequirementsDataGrid_LayoutUpdated(object sender, EventArgs e)
@@ -510,6 +564,7 @@ namespace VisualComparer
 
             selectedTcs.ForEach(x => AllTCsListBox.SelectedItems.Add(x));
             TCFilter.Text = temp;
+            RefreshHelpers();
         }
         private void AllTCsListBox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -529,10 +584,15 @@ namespace VisualComparer
             chapterSelectionWindow.ShowDialog();
             if (chapterSelectionWindow.DialogResult == true)
             {
+                Mouse.OverrideCursor = Cursors.Wait;
+                AllTCsListBox.SelectedItems.Clear();
+                RequirementsDataGrid.UpdateLayout();
+
                 var selectedChapter = chapterSelectionWindow.Answer;
                 Console.WriteLine(selectedChapter.chapter);
                 ShowOneChapter(selectedChapter.id, true);
                 ChapterNameTextBlock.Text = selectedChapter.chapter;
+                Mouse.OverrideCursor = Cursors.Arrow;
             }
         }
         private void RequirementsDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)

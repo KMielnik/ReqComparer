@@ -33,7 +33,7 @@ namespace VisualComparer
 
             requirements
                 .Where(x => x.Type == Requirement.Types.Head)
-                .Select(x => (chapter: Regex.Match(x.Text, @"^\d+\.+[\d.]+").Value, id: x.IDValue))
+                .Select(x => (chapter: Regex.Match(x.Text, @"^[\d.]+").Value, id: x.IDValue))
                 .Where(x => !string.IsNullOrWhiteSpace(x.chapter))
                 .ToList()
                 .ForEach(x => Reqs.Add(x));

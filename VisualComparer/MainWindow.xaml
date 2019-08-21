@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualComparer"
         mc:Ignorable="d" Loaded="Window_Loaded"
-        Title="MainWindow" Height="610" Width="1300">
+        Title="MiniDoorsy" Height="610" Width="1300">
     <Grid Drop="Grid_Drop" AllowDrop="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="12*"/>
