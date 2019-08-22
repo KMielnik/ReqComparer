@@ -161,6 +161,7 @@ namespace VisualComparer
                 .ScrollToVerticalOffset(reqsCollection.IndexOf(reqsCollection
                     .Skip(1)
                     .First(x => x.Type == ReqComparer.Requirement.Types.Head)));
+            ChapterNameTextBlock.Text = "-";
         }
 
         private void setBoldDataTrigger(DataGrid datagrid)

@@ -8,14 +8,18 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Net;
 using Newtonsoft.Json;
+using System.Timers;
+using System.Diagnostics;
 
 namespace ReqComparer
 {
     public class ReqParser
     {
+        public const string defaultCachedFileName = "cached_reqs.json";
+        private const string defaultServerCachedFileName = @"\\10.128.3.1\DFS_data_SSC_FS_Images-SSC\KMIM\MiniDoorsy\cached_reqs.json";
         public static readonly HashSet<TestCase> AllTestCases = new HashSet<TestCase>();
 
-        private HtmlDocument document = new HtmlDocument();
+        private HtmlDocument document;
 
         public async Task LoadFromFile(string filename)
             => await Task.Run(() =>
@@ -168,26 +172,72 @@ namespace ReqComparer
             return requirments;
         }
 
-        public async Task ParseToFileAsync(string filename, IProgress<string> progress)
+        public async Task ParseToFileAsync(IProgress<string> progress,string input, string output = defaultCachedFileName)
         {
             progress.Report("Loading file...(This will take a few mins.)");
-            await LoadFromFile(filename);
+
+            var clock = new Stopwatch();
+            var timer = new Timer(1000);
+            timer.Elapsed += (s, e) => progress.Report($"Loading file...(This will take a few mins.) {clock.Elapsed.ToString().Substring(0,8)}");
+
+            clock.Start();
+            timer.Start();
+            await LoadFromFile(input);
+            timer.Stop();
+            clock.Stop();
 
             progress.Report("Parsing requirements...");
             var requirements = GetRequiermentsList();
 
             progress.Report("Saving to file...");
-            File.WriteAllText("cached_reqs_" + ".json", JsonConvert.SerializeObject(requirements));
+
+            File.WriteAllLines(output,
+                new[] {
+                    JsonConvert.SerializeObject(DateTime.Now),
+                    JsonConvert.SerializeObject(requirements)
+                });
             Unload();
             progress.Report("Done.");
         }
 
-        public async Task<List<Requirement>> GetReqsFromCachedFile()
+        public async Task<(List<Requirement> reqs,DateTime exportDate)> GetReqsFromCachedFile(string filename = defaultCachedFileName)
         {
-            var filename = "cached_reqs_.json";
-            var json = File.ReadAllText(filename);
-            return await Task.Run(() => JsonConvert.DeserializeObject<List<Requirement>>(json));
+            string exportDateJson;
+            string reqJson;
+
+            if (!File.Exists(filename))
+                await DownloadNewestVersion();
+
+            var lines = File.ReadAllLines(filename);
+
+            exportDateJson = lines[0];
+            reqJson = lines[1];
+
+            return await Task.Run(() =>
+            (
+                JsonConvert.DeserializeObject<List<Requirement>>(reqJson),
+                JsonConvert.DeserializeObject<DateTime>(exportDateJson)
+            ));
         }
+
+        public async Task<bool> CheckForUpdates()
+        => await Task.Run(() =>
+        {
+            string cachedDateJson = File.ReadAllLines(defaultCachedFileName)[0];
+            string serverDateJson = File.ReadAllLines(defaultServerCachedFileName)[0];
+
+            var cachedDate = JsonConvert.DeserializeObject<DateTime>(cachedDateJson);
+            var serverDate = JsonConvert.DeserializeObject<DateTime>(serverDateJson);
+
+            return serverDate > cachedDate;
+        });
+
+        public async Task DownloadNewestVersion()
+        => await Task.Run(() =>
+        {
+            File.Copy(defaultServerCachedFileName, defaultCachedFileName, true);
+        });
+                
 
         public string GetRequiermentsString()
             => GetRequiermentsList()

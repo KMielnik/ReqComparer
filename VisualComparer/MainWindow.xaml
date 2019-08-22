@@ -13,17 +13,18 @@
         </Grid.RowDefinitions>
         <ContentControl Grid.Row="0" x:Name="RequirementsArea"/>
         <Grid Grid.Row="1">
-            <Button Name="ShowButton" Content="Show Default"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10 0" Padding="10 2"
-                    Click="ShowButton_Click"/>
-            <Button Content="Switch View"
-                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10 0" Padding="10 2"
-                    Click="SwitchViewButton_Click"/>
             <StackPanel Orientation="Horizontal"
-                        Margin="20 0" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="Pick Export File" Click="FileSelector_Click"
-                        Padding="10 2"/>
+                        Margin="20 0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock Text="Actual Version:" VerticalAlignment="Center"/>
+                <TextBlock Name="ActualExportDateTextBlock" VerticalAlignment="Center" Margin="5 0"/>
+                <Button Name="UpdateButton" Content="Get newest version"
+                        Padding="8 3" Margin="8 0" VerticalAlignment="Center" Click="UpdateButton_Click"/>
+                <Button Content="Select used cache file" Click="SelectFileButton_Click" Padding="8 3"/>
             </StackPanel>
+            <Button Content="Doors Exporter" Padding="8 3" Margin="20 0"
+                    VerticalAlignment="Center" HorizontalAlignment="Right"
+                    Click="ExporterButton_Click"/>
+            
         </Grid>
     </Grid>
 </Window>

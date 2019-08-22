@@ -15,7 +15,7 @@ namespace ConsoleTester
             var reqParser = new ReqParser();
             var timer = new System.Diagnostics.Stopwatch();
             timer.Start();
-            await reqParser.ParseToFileAsync("d.htm", new Progress<string>(x => { Console.WriteLine($"Stan:{x}"); }));
+            await reqParser.ParseToFileAsync(new Progress<string>(x => { Console.WriteLine($"Stan:{x}"); }),"e.htm");
             timer.Stop();
             Console.WriteLine($"Czas parsowania: {timer.Elapsed}");
 
