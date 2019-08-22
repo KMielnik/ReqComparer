@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:VisualComparer"
         mc:Ignorable="d" Loaded="Window_Loaded"
         Title="MiniDoorsy" Height="610" Width="1300">
-    <Grid Drop="Grid_Drop" AllowDrop="True">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="12*"/>
             <RowDefinition Height="1*" MinHeight="25" MaxHeight="50"/>

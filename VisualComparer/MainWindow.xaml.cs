@@ -37,33 +37,19 @@ namespace VisualComparer
 
         private async Task LoadReqsFromCache(string filename = "cached_reqs.json")
         {
-            var dataFromCache = await parser.GetReqsFromCachedFile(filename);
+            try
+            {
+                var dataFromCache = await parser.GetReqsFromCachedFile(filename);
 
-            reqsCollection.Clear();
-            await reqsCollection.AddRangeNotifyFinishAsync(dataFromCache.reqs);
+                reqsCollection.Clear();
+                await reqsCollection.AddRangeNotifyFinishAsync(dataFromCache.reqs);
 
-            ActualExportDateTextBlock.Text = $"{dataFromCache.exportDate.ToShortDateString()} {dataFromCache.exportDate.ToShortTimeString()}";
-        }
-
-        private async void FileSelector_Click(object sender, RoutedEventArgs e)
-        {
-            //var dlg = new Microsoft.Win32.OpenFileDialog
-            //{
-            //    DefaultExt = ".htm",
-            //    Filter = "HTML Files (*.htm)|*.htm|JSON Files (*.json)|*.json"
-            //};
-
-            //if (dlg.ShowDialog() == true)
-            //    await LoadReqsFromFile(dlg.FileName);
-        }
-
-        private async void Grid_Drop(object sender, DragEventArgs e)
-        {
-            //string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            //if (files[0].Contains(".htm"))
-            //    await LoadReqsFromFile(files[0]);
-            //else
-            //    MessageBox.Show("Invalid file format.\nTry with .htm next time.");
+                ActualExportDateTextBlock.Text = $"{dataFromCache.exportDate.ToShortDateString()} {dataFromCache.exportDate.ToShortTimeString()}";
+            }
+            catch
+            {
+                MessageBox.Show("Error while loading the cached file.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)

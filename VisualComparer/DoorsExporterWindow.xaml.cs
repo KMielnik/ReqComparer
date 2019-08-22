@@ -27,7 +27,7 @@ namespace VisualComparer
             this.parser = parser;
         }
 
-        private async void InputButton_Click(object sender, RoutedEventArgs e)
+        private void InputButton_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
@@ -56,13 +56,28 @@ namespace VisualComparer
                 OutputTextBox.CaretIndex = OutputTextBox.Text.Length;
             }
         }
-
+        private Task parseTask = null;
         private async void ParseButton_Click(object sender, RoutedEventArgs e)
         {
-            await parser.ParseToFileAsync(
-                new Progress<string>(x => ProgressTextBlock.Text = x),
-                InputTextBox.Text,
-                OutputTextBox.Text);
+            if (string.IsNullOrWhiteSpace(InputTextBox.Text))
+            {
+                ProgressTextBlock.Text = "Select input/output files";
+                return;
+            }
+
+            try
+            {
+                parseTask = parser.ParseToFileAsync(
+                    new Progress<string>(x => ProgressTextBlock.Text = x),
+                    InputTextBox.Text,
+                    OutputTextBox.Text);
+                await parseTask;
+            }
+            catch(Exception)
+            {
+                ProgressTextBlock.Text = "ERROR!";
+                MessageBox.Show("Error while parsing the file", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -75,6 +90,10 @@ namespace VisualComparer
         {
             OutputTextBox.Text = "";
             OutputButton.IsEnabled = true;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
         }
     }
 }
