@@ -16,7 +16,7 @@ namespace ReqComparer
     public class ReqParser
     {
         public const string defaultCachedFileName = "cached_reqs.json";
-        private const string defaultServerCachedFileName = @"\\10.128.3.1\DFS_data_SSC_FS_Images-SSC\KMIM\MiniDoorsy\cached_reqs.json";
+        private const string defaultServerCachedFileName = @"\\10.128.3.1\DFS_data_SSC_FS_Images-SSC\KMIM\MiniDoorsy\Data\cached_reqs.json";
         public static readonly HashSet<TestCase> AllTestCases = new HashSet<TestCase>();
 
         private HtmlDocument document;
@@ -172,13 +172,13 @@ namespace ReqComparer
             return requirments;
         }
 
-        public async Task ParseToFileAsync(IProgress<string> progress,string input, string output = defaultCachedFileName)
+        public async Task ParseToFileAsync(IProgress<string> progress, string input, string output = defaultCachedFileName)
         {
             progress.Report("Loading file...(This will take a few mins.)");
 
             var clock = new Stopwatch();
             var timer = new Timer(1000);
-            timer.Elapsed += (s, e) => progress.Report($"Loading file...(This will take a few mins.) {clock.Elapsed.ToString().Substring(0,8)}");
+            timer.Elapsed += (s, e) => progress.Report($"Loading file...(This will take a few mins.) {clock.Elapsed.ToString().Substring(0, 8)}");
 
             clock.Start();
             timer.Start();

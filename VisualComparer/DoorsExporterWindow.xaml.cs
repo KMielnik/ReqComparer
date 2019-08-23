@@ -1,6 +1,7 @@
 ﻿using ReqComparer;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,7 +60,7 @@ namespace VisualComparer
         private Task parseTask = null;
         private async void ParseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(InputTextBox.Text))
+            if (string.IsNullOrWhiteSpace(InputTextBox.Text) || string.IsNullOrWhiteSpace(OutputTextBox.Text))
             {
                 ProgressTextBlock.Text = "Select input/output files";
                 return;
@@ -70,7 +71,8 @@ namespace VisualComparer
                 parseTask = parser.ParseToFileAsync(
                     new Progress<string>(x => ProgressTextBlock.Text = x),
                     InputTextBox.Text,
-                    OutputTextBox.Text);
+                    OutputTextBox.Text)
+                    .ContinueWith((s)=>MessageBox.Show("Parsing done"));
                 await parseTask;
             }
             catch(Exception)
@@ -92,8 +94,23 @@ namespace VisualComparer
             OutputButton.IsEnabled = true;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
+            if(parseTask != null && !parseTask.IsCompleted)
+            {
+                MessageBox.Show("You are still parsing a file.\nThe task will continue as long as any app window is open.");
+                if (MessageBox.Show("Still want to close this window?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+            base.OnClosing(e);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"\\10.128.3.1\DFS_data_SSC_FS_Images-SSC\KMIM\MiniDoorsy\Data\export_instructions.pdf");
         }
     }
 }

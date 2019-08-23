@@ -4,16 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualComparer" WindowStartupLocation="CenterScreen"
-        mc:Ignorable="d" Closing="Window_Closing"
+        mc:Ignorable="d"
         Title="Doors Exporter" SizeToContent="WidthAndHeight" MinWidth="500" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="10">
+        <Button Grid.Row="0" Content="INSTRUCTIONS" Click="Button_Click" Margin="2"/>
+
+        <Grid Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
@@ -23,7 +26,7 @@
             <Button Grid.Column="1" Content="Select Input File" Width="120" VerticalAlignment="Center" Padding="10 3" Click="InputButton_Click"/>
         </Grid>
 
-        <Grid Grid.Row="1" Margin="10">
+        <Grid Grid.Row="2" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
@@ -37,7 +40,7 @@
             
         </Grid>
 
-        <Grid Grid.Row="2" Margin="10">
+        <Grid Grid.Row="3" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
