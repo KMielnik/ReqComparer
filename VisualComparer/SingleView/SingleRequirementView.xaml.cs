@@ -26,12 +26,19 @@ namespace VisualComparer
         private ObservableCollection<Dictionary<string, bool>> ReqBottomHelperData;
 
         private Brush[] brushes = {
-            Brushes.Red,
-            Brushes.Blue,
-            Brushes.Green,
-            Brushes.Purple,
-            Brushes.Orange,
-            Brushes.Navy
+            GetBrushFromHex("#e6194B"),
+            GetBrushFromHex("#3cb44b"),
+            GetBrushFromHex("#ffe119"),
+            GetBrushFromHex("#4363d8"),
+            GetBrushFromHex("#f58231"),
+            GetBrushFromHex("#911eb4"),
+            GetBrushFromHex("#42d4f4"),
+            GetBrushFromHex("#f032e6"),
+            GetBrushFromHex("#bfef45"),
+            GetBrushFromHex("#fabebe"),
+            GetBrushFromHex("#469990"),
+            GetBrushFromHex("#e6beff"),
+            GetBrushFromHex("#9A6324")
         };
 
         public SingleRequirementView(ListWithNotifications<ReqComparer.Requirement> basicReqs)
@@ -61,6 +68,9 @@ namespace VisualComparer
             setBoldDataTrigger(RequirementsDataGrid);
             setVisibilityDataTrigger(RequirementsDataGrid);
         }
+
+        private static SolidColorBrush GetBrushFromHex(string hex)
+            => (SolidColorBrush)new BrushConverter().ConvertFrom(hex);
 
         private void SetTCListView()
         {
