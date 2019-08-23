@@ -238,7 +238,6 @@ namespace ReqComparer
             File.Copy(defaultServerCachedFileName, defaultCachedFileName, true);
         });
                 
-
         public string GetRequiermentsString()
             => GetRequiermentsList()
                 .Select(x => $"{new string('\t', x.Level)}{x.ID}: {x.Text}\n")

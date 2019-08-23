@@ -59,13 +59,13 @@ namespace VisualComparer
 
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ReqsListView.SelectedItem == null)
+            if (ReqsListView.SelectedItem == null && ReqsListView.Items.Count !=1)
             {
                 MessageBox.Show("Please select chapter.");
                 return;
             }
 
-            Answer = (ValueTuple<string, int>)ReqsListView.SelectedItem;
+            Answer = (ValueTuple<string, int>) (ReqsListView.SelectedItem ?? ReqsListView.Items[0]);
             DialogResult = true;
         }
 
