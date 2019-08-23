@@ -13,11 +13,16 @@ namespace ConsoleTester
         static async Task Main(string[] args)
         {
             var reqParser = new ReqParser();
-            await reqParser.LoadFromFile("d.htm");
-            var list = reqParser.GetRequiermentsList();
+            var timer = new System.Diagnostics.Stopwatch();
+            timer.Start();
+            await reqParser.ParseToFileAsync(new Progress<string>(x => { Console.WriteLine($"Stan:{x}"); }),"e.htm");
+            timer.Stop();
+            Console.WriteLine($"Czas parsowania: {timer.Elapsed}");
 
-            //Console.WriteLine(reqParser.GetRequiermentsString());
-            Console.WriteLine(list.Aggregate("",(acc,x)=>acc+x.ToString()+"\n"));
+            timer.Restart();
+            await reqParser.GetReqsFromCachedFile();
+            timer.Stop();
+            Console.WriteLine($"Czas ładowania: {timer.Elapsed}");
             Console.ReadKey(true);
         }
     }

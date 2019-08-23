@@ -4,26 +4,27 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualComparer"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="610" Width="1300">
-    <Grid Drop="Grid_Drop" AllowDrop="True">
+        mc:Ignorable="d" Loaded="Window_Loaded"
+        Title="MiniDoorsy" Height="610" Width="1300">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="12*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*" MinHeight="25" MaxHeight="50"/>
         </Grid.RowDefinitions>
         <ContentControl Grid.Row="0" x:Name="RequirementsArea"/>
         <Grid Grid.Row="1">
-            <Button Name="ShowButton" Content="Show Default"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" Padding="10 2"
-                    Click="ShowButton_Click"/>
-            <Button Content="Switch View"
-                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10" Padding="10 2"
-                    Click="SwitchViewButton_Click"/>
             <StackPanel Orientation="Horizontal"
-                        Margin="20 10" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="Pick Export File" Click="FileSelector_Click"
-                        Padding="10 2"/>
+                        Margin="20 0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock Text="Actual Version:" VerticalAlignment="Center"/>
+                <TextBlock Name="ActualExportDateTextBlock" VerticalAlignment="Center" Margin="5 0"/>
+                <Button Name="UpdateButton" Content="Get newest version"
+                        Padding="8 3" Margin="8 0" VerticalAlignment="Center" Click="UpdateButton_Click"/>
+                <Button Content="Select used cache file" Click="SelectFileButton_Click" Padding="8 3"/>
             </StackPanel>
+            <Button Content="Doors Exporter" Padding="8 3" Margin="20 0"
+                    VerticalAlignment="Center" HorizontalAlignment="Right"
+                    Click="ExporterButton_Click"/>
+            
         </Grid>
     </Grid>
 </Window>

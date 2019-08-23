@@ -22,8 +22,8 @@ namespace VisualComparer
     public partial class DoubleRequirementView : UserControl
     {
         public ObservableCollection<RequirementDoubleView> reqsCollection { get; set; }
-        private ObservableCollection<ReqComparer.Requirement> basicReqs;
-        public DoubleRequirementView(ObservableCollection<ReqComparer.Requirement> basicReqs)
+        private ListWithNotifications<ReqComparer.Requirement> basicReqs;
+        public DoubleRequirementView(ListWithNotifications<ReqComparer.Requirement> basicReqs)
         {
             InitializeComponent();
             reqsCollection = new ObservableCollection<RequirementDoubleView>();

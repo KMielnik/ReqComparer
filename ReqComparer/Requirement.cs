@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -6,38 +7,50 @@ namespace ReqComparer
 {
     public class Requirement
     {
-        public static HashSet<TestCase> AllTestCases = new HashSet<TestCase>();
         public string ID { get; protected set; }
-        public int IDValue { get => int.Parse(ID.Replace("PR_PH_", "")); }
+        [JsonIgnore]
+        public int IDValue { get; private set; }
         public string Text { get; protected set; }
-        public string TextIntended { get => new string(' ', Level * 3) + Text; }
+        public Types Type { get; protected set; }
+        [JsonIgnore]
+        public string TextIntended { get; private set; }
         public string FVariants { get; set; }
         public int Level { get; protected set; }
         public List<TestCase> TCs;
-        public IEnumerable<int> TCIDsValue { get => TCs.Select(x => x.IDValue); }
-        public string TCStringified { get => TCs.Aggregate("TC:", (acc, x) => acc + " " + x.ID); }
-        public bool IsImportant { get => !Regex.IsMatch(Text, @"^[A-Za-z]+?:"); }
+        [JsonIgnore]
+        public HashSet<int> TCIDsValue { get; private set; }
+        [JsonIgnore]
+        public string TCStringified { get; private set; }
+        [JsonIgnore]
+        public bool IsImportant { get; private set; }
 
-        public Requirement(string iD, string text, int level, List<TestCase> TCs, string fVariants)
+        public enum Types
+        {
+            Head,
+            Req,
+            Info
+        }
+
+        public Requirement(string iD, string text, int level, List<TestCase> TCs, string fVariants, Types type)
         {
             ID = iD;
+            IDValue = int.Parse(ID.Replace("PR_PH_", ""));
             Text = text;
             Level = level;
+            TextIntended = new string(' ', Level * 3) + Text;
 
             FVariants = fVariants;
 
+            this.Type = type;
+
             this.TCs = new List<TestCase>();
 
-            TCs.ForEach(TC =>
-            {
-                this.TCs.Add(TC);
+            this.TCs.AddRange(TCs);
 
-                AllTestCases.Add(TC);
-            });
+            TCIDsValue = TCs.Select(x => x.IDValue).ToHashSet();
+            TCStringified = TCs.Aggregate("TC:", (acc, x) => acc + " " + x.ID);
+            IsImportant = !Regex.IsMatch(Text, @"^[A-Za-z]+?:"); ;
         }
-
-        protected Requirement()
-        { }
 
         public override string ToString()
             => $"Level: {Level} ID: {ID} Text:{Text} FVariants:{FVariants}\n" +
@@ -47,13 +60,15 @@ namespace ReqComparer
     public class TestCase
     {
         public string ID { get; protected set; }
-        public int IDValue { get => int.Parse(ID); }
+        [JsonIgnore]
+        public int IDValue { get; set; }
         public string Text { get; set; }
         public string ValidFrom { get; set; }
         public string ValidTo { get; set; }
         public TestCase(string ID, string Text, (string From, string To) Valid)
         {
             this.ID = ID;
+            IDValue = int.Parse(ID);
             this.Text = Text;
             this.ValidFrom = Valid.From;
             this.ValidTo = Valid.To;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,58 +24,70 @@ namespace VisualComparer
     public partial class MainWindow : Window
     {
         readonly ReqParser parser;
-        public ObservableCollection<Requirement> reqsCollection { get; set; }
+        public ListWithNotifications<Requirement> reqsCollection { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             parser = new ReqParser();
-            reqsCollection = new ObservableCollection<Requirement>();
+            reqsCollection = new ListWithNotifications<Requirement>();
 
             RequirementsArea.Content = new SingleRequirementView(reqsCollection);
         }
 
-        private async Task LoadReqsFromFile(string filename)
+        private async Task LoadReqsFromCache(string filename = "cached_reqs.json")
         {
-                await parser.LoadFromFile(filename);
-                var reqs = parser.GetRequiermentsList();
+            try
+            {
+                var dataFromCache = await parser.GetReqsFromCachedFile(filename);
 
                 reqsCollection.Clear();
-                reqs.ForEach(x => reqsCollection.Add(x));
+                await reqsCollection.AddRangeNotifyFinishAsync(dataFromCache.reqs);
+
+                ActualExportDateTextBlock.Text = $"{dataFromCache.exportDate.ToShortDateString()} {dataFromCache.exportDate.ToShortTimeString()}";
+            }
+            catch
+            {
+                MessageBox.Show("Error while loading the cached file.", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private async void ShowButton_Click(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadReqsFromFile("d.htm");
+            await LoadReqsFromCache();
+            if (await parser.CheckForUpdates())
+                UpdateButton.Content = "Update Available!";
         }
 
-        private void SwitchViewButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (RequirementsArea.Content is SingleRequirementView)
-                RequirementsArea.Content = new DoubleRequirementView(reqsCollection);
-            else
-                RequirementsArea.Content = new SingleRequirementView(reqsCollection);
+            var result = MessageBox.Show("Do you want to replace actual cached file with newest one from server?", "Confirm replacement.",
+                MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            if (result == MessageBoxResult.OK)
+            {
+                await parser.DownloadNewestVersion();
+                await LoadReqsFromCache();
+                UpdateButton.Content = "Get newest version";
+            }
         }
 
-        private async void FileSelector_Click(object sender, RoutedEventArgs e)
+        private void ExporterButton_Click(object sender, RoutedEventArgs e)
+        {
+            var exporterWindow = new DoorsExporterWindow(parser);
+            exporterWindow.Show();
+        }
+
+        private async void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new Microsoft.Win32.OpenFileDialog
             {
-                DefaultExt = ".htm",
-                Filter = "HTML Files (*.htm)|*.htm"
+                DefaultExt = ".json",
+                Filter = "JSON Files (*.json)|*.json"
             };
 
+            dlg.InitialDirectory = Directory.GetCurrentDirectory();
             if (dlg.ShowDialog() == true)
-                await LoadReqsFromFile(dlg.FileName);
-        }
-
-        private async void Grid_Drop(object sender, DragEventArgs e)
-        {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (files[0].Contains(".htm"))
-                await LoadReqsFromFile(files[0]);
-            else
-                MessageBox.Show("Invalid file format.\nTry with .htm next time.");
+                await LoadReqsFromCache(dlg.FileName);
         }
     }
 }
