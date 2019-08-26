@@ -15,9 +15,9 @@
         <Grid Grid.Row="1">
             <StackPanel Orientation="Horizontal"
                         Margin="20 0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <TextBlock Text="Actual Version:" VerticalAlignment="Center"/>
+                <TextBlock Text="Cache Version:" VerticalAlignment="Center"/>
                 <TextBlock Name="ActualExportDateTextBlock" VerticalAlignment="Center" Margin="5 0"/>
-                <Button Name="UpdateButton" Content="Get newest version"
+                <Button Name="UpdateButton" Content="Get latest version"
                         Padding="8 3" Margin="8 0" VerticalAlignment="Center" Click="UpdateButton_Click"/>
                 <Button Content="Select used cache file" Click="SelectFileButton_Click" Padding="8 3"/>
             </StackPanel>

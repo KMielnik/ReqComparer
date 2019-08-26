@@ -278,13 +278,22 @@ namespace VisualComparer
             RefreshHelpers();
         }
 
+        private int actualBrush = 0;
         private void AllTCsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RefreshRequirementsDataGrid();
+            if (AllTCsListBox.SelectedItems.Count == 0)
+                actualBrush = 0;
 
-            int actualBrush = 0;
+            foreach (int TCSelected in e.RemovedItems)
+            {
+                var removedColumn = RequirementsDataGrid.Columns
+                    .Where(x => int.TryParse(x.Header.ToString(), out _))
+                    .FirstOrDefault(x => (int)x.Header == TCSelected);
+                if (removedColumn != null)
+                    RequirementsDataGrid.Columns.Remove(removedColumn);
+            }
 
-            foreach (int TCSelected in AllTCsListBox.SelectedItems)
+            foreach (int TCSelected in e.AddedItems)
             {
                 DataGridTextColumn TCColumn = new DataGridTextColumn
                 {
@@ -562,19 +571,12 @@ namespace VisualComparer
             var selectedTcs = AllTCsListBox
                 .SelectedItems
                 .Cast<int>()
-                //.OrderByDescending(x => x)
+                .OrderByDescending(x => x)
                 .ToList();
 
-            AllTCsListBox.SelectedItems.Clear();
-
-            var temp = TCFilter.Text;
-            TCFilter.Text = "";
-            RefreshFilteredTCs();
 
             selectedTcs.ForEach(x => FilteredTCs.Move(FilteredTCs.IndexOf(x), 0));
-
-            selectedTcs.ForEach(x => AllTCsListBox.SelectedItems.Add(x));
-            TCFilter.Text = temp;
+            AllTCsListBox.UpdateLayout();
             RefreshHelpers();
         }
         private void AllTCsListBox_LostFocus(object sender, RoutedEventArgs e)

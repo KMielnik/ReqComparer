@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ReqComparer;
+using System.Deployment.Application;
+using System.Threading;
+using System.Windows.Media;
 
 namespace VisualComparer
 {
@@ -33,6 +23,19 @@ namespace VisualComparer
             reqsCollection = new ListWithNotifications<Requirement>();
 
             RequirementsArea.Content = new SingleRequirementView(reqsCollection);
+        }
+
+        private void DisplayChangeLog()
+        {
+            if (!ApplicationDeployment.IsNetworkDeployed)
+                return;
+
+            Title += " " + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
+
+            if (!ApplicationDeployment.CurrentDeployment.IsFirstRun)
+                return;
+
+            MessageBox.Show("Changelog:\n\t-fixed reqs columns resetting in specific situations\n\t-small UI changes\n\t-testing changelog message after update");
         }
 
         private async Task LoadReqsFromCache(string filename = "cached_reqs.json")
@@ -56,7 +59,12 @@ namespace VisualComparer
         {
             await LoadReqsFromCache();
             if (await parser.CheckForUpdates())
+            {
                 UpdateButton.Content = "Update Available!";
+                UpdateButton.Background = Brushes.Red;
+            }
+
+            DisplayChangeLog();
         }
 
         private async void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -68,6 +76,7 @@ namespace VisualComparer
                 await parser.DownloadNewestVersion();
                 await LoadReqsFromCache();
                 UpdateButton.Content = "Get newest version";
+                UpdateButton.Background = Brushes.Gainsboro;
             }
         }
 

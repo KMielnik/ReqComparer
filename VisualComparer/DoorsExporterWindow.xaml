@@ -14,7 +14,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Content="INSTRUCTIONS" Click="Button_Click" Margin="2"/>
+        <Button Grid.Row="0" Content="HELP" Click="Button_Click" Margin="2"/>
 
         <Grid Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
