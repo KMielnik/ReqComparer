@@ -344,7 +344,6 @@ namespace VisualComparer
             }
 
             SetReqHelpersColumns();
-            RefreshHelpers();
         }
 
         private void Helper_RightClickEvent(object sender, MouseButtonEventArgs e)
