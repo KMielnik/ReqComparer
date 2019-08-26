@@ -27,15 +27,16 @@ namespace VisualComparer
 
         private void DisplayChangeLog()
         {
+            
             if (!ApplicationDeployment.IsNetworkDeployed)
                 return;
 
-            Title += " " + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
+            Title += " - " + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
 
             if (!ApplicationDeployment.CurrentDeployment.IsFirstRun)
                 return;
 
-            MessageBox.Show("Changelog:\n\t-fixed reqs columns resetting in specific situations\n\t-small UI changes\n\t-testing changelog message after update");
+            new ChangelogWindow().Show();
         }
 
         private async Task LoadReqsFromCache(string filename = "cached_reqs.json")
@@ -57,14 +58,14 @@ namespace VisualComparer
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            DisplayChangeLog();
+
             await LoadReqsFromCache();
             if (await parser.CheckForUpdates())
             {
                 UpdateButton.Content = "Update Available!";
                 UpdateButton.Background = Brushes.Red;
             }
-
-            DisplayChangeLog();
         }
 
         private async void UpdateButton_Click(object sender, RoutedEventArgs e)
