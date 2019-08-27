@@ -636,13 +636,17 @@ namespace VisualComparer
                 .SelectedItems
                 .Cast<int>()
                 .Reverse()
-                .Where(x => FilteredTCs.IndexOf(x) != 0)
                 .ToList();
+
+            if (selectedTcs.Count == 1 && FilteredTCs.IndexOf(selectedTcs[0]) == 0)
+                return;
 
             var tempFilter = TCFilter.Text;
             TCFilter.Text = "";
+
             selectedTcs
                 .ForEach(x => FilteredTCs.Move(FilteredTCs.IndexOf(x), 0));
+
             TCFilter.Text = tempFilter;
             AllTCsListBox.UpdateLayout();
             RefreshHelpers();
