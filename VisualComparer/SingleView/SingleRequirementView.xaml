@@ -82,24 +82,20 @@
         </Grid>
         <Grid Grid.Column="1" Margin="10">
             <DataGrid Name="ReqHelperTop" Height="16" VerticalAlignment="Top" FontSize="10"
-                      HeadersVisibility="None" VerticalScrollBarVisibility="Disabled"
+                      HeadersVisibility="None" GotFocus="Helper_GotFocus"
                       HorizontalScrollBarVisibility="Hidden"
                       CanUserAddRows="False" IsReadOnly="True"/>
-            
+
             <DataGrid Name="RequirementsDataGrid" Grid.Column="1"  CanUserSortColumns="False"
                   Margin="0 16" AutoGenerateColumns="False" HeadersVisibility="Column"
                       AlternationCount="2" AlternatingRowBackground="AliceBlue"
                   ScrollViewer.ScrollChanged="RequirementsDataGrid_ScrollChanged"
                       LayoutUpdated="RequirementsDataGrid_LayoutUpdated"
                       ColumnDisplayIndexChanged="RequirementsDataGrid_ColumnDisplayIndexChanged"
-                      VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
-                <DataGrid.RowStyle>
-                    <Style></Style>
-                </DataGrid.RowStyle>
-            </DataGrid>
-            
+                      VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"/>
+
             <DataGrid Name="ReqHelperBottom" Height="16" VerticalAlignment="Bottom"
-                      HeadersVisibility="None" VerticalScrollBarVisibility="Disabled"
+                      HeadersVisibility="None" GotFocus="Helper_GotFocus"
                       HorizontalScrollBarVisibility="Hidden"
                       CanUserAddRows="False" IsReadOnly="True"/>
         </Grid>

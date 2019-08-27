@@ -65,6 +65,8 @@ namespace VisualComparer
             ReqHelperTop.ItemsSource = ReqTopHelperData;
             ReqHelperBottom.ItemsSource = ReqBottomHelperData;
 
+            RequirementsDataGrid.RowStyle = new Style();
+
             setBoldDataTrigger(RequirementsDataGrid);
             setVisibilityDataTrigger(RequirementsDataGrid);
         }
@@ -334,13 +336,13 @@ namespace VisualComparer
                 TCColumn.HeaderStyle.Setters.Add(new EventSetter()
                 {
                     Event = MouseDoubleClickEvent,
-                    Handler = new MouseButtonEventHandler(Helper_DoubleClickEvent)
+                    Handler = new MouseButtonEventHandler(ColumnHeader_DoubleClickEvent)
                 });
 
                 TCColumn.HeaderStyle.Setters.Add(new EventSetter()
                 {
                     Event = MouseRightButtonDownEvent,
-                    Handler = new MouseButtonEventHandler(Helper_RightClickEvent)
+                    Handler = new MouseButtonEventHandler(ColumnHeader_RightClickEvent)
                 });
 
                 TCColumn.HeaderStyle.Setters.Add(new Setter()
@@ -355,7 +357,7 @@ namespace VisualComparer
             SetReqHelpersColumns();
         }
 
-        private void Helper_RightClickEvent(object sender, MouseButtonEventArgs e)
+        private void ColumnHeader_RightClickEvent(object sender, MouseButtonEventArgs e)
         {
             var TC = (int)(sender as System.Windows.Controls.Primitives.DataGridColumnHeader).Content;
             RequirementsDataGrid.SelectedItems.Clear();
@@ -366,7 +368,7 @@ namespace VisualComparer
             RequirementsDataGrid.Focus();
         }
 
-        private void Helper_DoubleClickEvent(object sender, MouseButtonEventArgs e)
+        private void ColumnHeader_DoubleClickEvent(object sender, MouseButtonEventArgs e)
         {
             var header = (System.Windows.Controls.Primitives.DataGridColumnHeader)sender;
 
@@ -434,12 +436,74 @@ namespace VisualComparer
                     Value = brushes[actualBrush++ % brushes.Length]
                 });
 
+                var eventTrigger = new EventSetter()
+                {
+                    Event = PreviewMouseLeftButtonDownEvent,
+                    Handler = new MouseButtonEventHandler(Helper_LeftClickEvent)
+                };
+
                 ReqHelperTop.Columns.Last().CellStyle = new Style();
                 ReqHelperTop.Columns.Last().CellStyle.Triggers.Add(dataTrigger);
+                ReqHelperTop.Columns.Last().CellStyle.Setters.Add(eventTrigger);
 
                 ReqHelperBottom.Columns.Last().CellStyle = new Style();
                 ReqHelperBottom.Columns.Last().CellStyle.Triggers.Add(dataTrigger);
+                ReqHelperBottom.Columns.Last().CellStyle.Setters.Add(eventTrigger);
             }
+        }
+
+        private void Helper_LeftClickEvent(object sender, MouseButtonEventArgs e)
+        {
+            var gridCell = (DataGridCell)sender;
+            var tc = (int)gridCell.Column.Header;
+
+            var senderDatagrid = VisualTreeHelper.GetParent(gridCell);
+            while (senderDatagrid != null && senderDatagrid.GetType() != typeof(DataGrid))
+                senderDatagrid = VisualTreeHelper.GetParent(senderDatagrid);
+
+            var isGoingDown = ((DataGrid)senderDatagrid).Name == nameof(ReqHelperBottom);
+
+            var selectedRows = RequirementsDataGrid.SelectedItems.Count;
+
+            if (selectedRows >= 1)
+            {
+                var firstSelected = (RequirementSingleView)RequirementsDataGrid.SelectedItems[0];
+                RequirementsDataGrid.SelectedItems.Clear();
+
+                if (firstSelected.TCIDsValue.Contains(tc))
+                    RequirementsDataGrid.SelectedItems.Add(firstSelected);
+                else
+                    RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+
+                RequirementsDataGrid.ScrollIntoView(firstSelected);
+
+                if (selectedRows > 1)
+                    return;
+
+
+                RequirementsDataGrid.SelectedItems.Clear();
+                var reqs = reqsCollection.AsEnumerable();
+                if (isGoingDown == false)
+                    reqs = reqs.Reverse();
+
+                RequirementsDataGrid.SelectedItems
+                    .Add(reqs
+                        .SkipWhile(x => x != firstSelected)
+                        .Skip(1)
+                        .FirstOrDefault(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+
+                if (RequirementsDataGrid.SelectedItem == null)
+                    RequirementsDataGrid.SelectedItems.Add(firstSelected);
+
+                RequirementsDataGrid.ScrollIntoView(RequirementsDataGrid.SelectedItem);
+            }
+            else
+            {
+                RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+                RequirementsDataGrid.ScrollIntoView((RequirementSingleView)RequirementsDataGrid.SelectedItems[0]);
+            }
+
+            RequirementsDataGrid.Focus();
         }
 
         public static ScrollViewer GetScrollViewer(UIElement element)
@@ -626,6 +690,14 @@ namespace VisualComparer
         private void ChapterClear_Click(object sender, RoutedEventArgs e)
         {
             ShowOneChapter(0);
+        }
+
+        private void Helper_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var helper = (DataGrid)sender;
+            helper.SelectedItems.Clear();
+
+            RequirementsDataGrid.Focus();
         }
     }
 }
