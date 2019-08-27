@@ -35,5 +35,10 @@ namespace VisualComparer
 
             richTextBox.Selection.Load(stream, DataFormats.Rtf);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

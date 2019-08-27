@@ -572,11 +572,13 @@ namespace VisualComparer
                 .SelectedItems
                 .Cast<int>()
                 .Reverse()
+                .Where(x => FilteredTCs.IndexOf(x) != 0)
                 .ToList();
 
             var tempFilter = TCFilter.Text;
             TCFilter.Text = "";
-            selectedTcs.ForEach(x => FilteredTCs.Move(FilteredTCs.IndexOf(x), 0));
+            selectedTcs
+                .ForEach(x => FilteredTCs.Move(FilteredTCs.IndexOf(x), 0));
             TCFilter.Text = tempFilter;
             AllTCsListBox.UpdateLayout();
             RefreshHelpers();

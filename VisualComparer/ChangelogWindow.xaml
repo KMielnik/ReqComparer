@@ -13,6 +13,6 @@
         </Grid.RowDefinitions>
         <RichTextBox Loaded="RichTextBox_Loaded" Margin="10" IsReadOnly="True"/>
         <Button IsDefault="True" IsCancel="True" Grid.Row="1" Content="Ok" Padding="10 3" Margin="10 0"
-                HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                HorizontalAlignment="Right" VerticalAlignment="Center" Click="Button_Click"/>
     </Grid>
 </Window>
