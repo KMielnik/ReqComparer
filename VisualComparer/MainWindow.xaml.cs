@@ -27,6 +27,8 @@ namespace VisualComparer
 
         private void DisplayChangeLog()
         {
+            new ChangelogWindow().Show();
+
             if (!ApplicationDeployment.IsNetworkDeployed)
                 return;
 

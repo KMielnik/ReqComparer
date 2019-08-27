@@ -30,10 +30,17 @@ namespace VisualComparer
         {
             var richTextBox = (RichTextBox)sender;
 
-            var changelogText = File.ReadAllBytes(changelogPath);
-            MemoryStream stream = new MemoryStream(changelogText);
+            try
+            {
+                var changelogText = File.ReadAllBytes(changelogPath);
+                MemoryStream stream = new MemoryStream(changelogText);
 
-            richTextBox.Selection.Load(stream, DataFormats.Rtf);
+                richTextBox.Selection.Load(stream, DataFormats.Rtf);
+            }
+            catch
+            {
+                MessageBox.Show($"Error with opening changelog, to see it manually go to {changelogPath}");
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

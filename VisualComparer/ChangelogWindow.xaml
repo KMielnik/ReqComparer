@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualComparer"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="ChangelogWindow" Width="300" Height="400">
+        Title="ChangelogWindow" Width="800" Height="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
