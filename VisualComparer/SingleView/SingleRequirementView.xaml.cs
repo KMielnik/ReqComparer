@@ -281,18 +281,7 @@ namespace VisualComparer
 
         private async Task SelectMultipleTCs(List<int> tcs)
         {
-            await Task.Run(async () =>
-            {
-                const int batchSize = 15;
-                int actualNo = 0;
-
-                foreach(var tc in tcs)
-                {
-                    await AllTCsListBox.Dispatcher.BeginInvoke((Action)(() => AllTCsListBox.SelectedItems.Add(tc)));
-                    if (++actualNo % batchSize == 0)
-                        await Task.Delay(100);
-                }
-            });
+            tcs.ForEach(x => AllTCsListBox.SelectedItems.Add(x));
         }
 
         private async Task AddTCColumn(int tc)
