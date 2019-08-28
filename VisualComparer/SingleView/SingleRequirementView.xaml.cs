@@ -542,60 +542,6 @@ namespace VisualComparer
             }
         }
 
-        private void Helper_LeftClickEvent(object sender, MouseButtonEventArgs e)
-        {
-            var gridCell = (DataGridCell)sender;
-            var tc = (int)gridCell.Column.Header;
-
-            var senderDatagrid = VisualTreeHelper.GetParent(gridCell);
-            while (senderDatagrid != null && senderDatagrid.GetType() != typeof(DataGrid))
-                senderDatagrid = VisualTreeHelper.GetParent(senderDatagrid);
-
-            var isGoingDown = ((DataGrid)senderDatagrid).Name == nameof(ReqHelperBottom);
-
-            var selectedRows = RequirementsDataGrid.SelectedItems.Count;
-
-            if (selectedRows >= 1)
-            {
-                var firstSelected = (RequirementSingleView)RequirementsDataGrid.SelectedItems[0];
-                RequirementsDataGrid.SelectedItems.Clear();
-
-                if (firstSelected.TCIDsValue.Contains(tc))
-                    RequirementsDataGrid.SelectedItems.Add(firstSelected);
-                else
-                    RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
-
-                RequirementsDataGrid.ScrollIntoView(firstSelected);
-
-                if (selectedRows > 1)
-                    return;
-
-
-                RequirementsDataGrid.SelectedItems.Clear();
-                var reqs = reqsCollection.AsEnumerable();
-                if (isGoingDown == false)
-                    reqs = reqs.Reverse();
-
-                RequirementsDataGrid.SelectedItems
-                    .Add(reqs
-                        .SkipWhile(x => x != firstSelected)
-                        .Skip(1)
-                        .FirstOrDefault(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
-
-                if (RequirementsDataGrid.SelectedItem == null)
-                    RequirementsDataGrid.SelectedItems.Add(firstSelected);
-
-                RequirementsDataGrid.ScrollIntoView(RequirementsDataGrid.SelectedItem);
-            }
-            else
-            {
-                RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
-                RequirementsDataGrid.ScrollIntoView((RequirementSingleView)RequirementsDataGrid.SelectedItems[0]);
-            }
-
-            RequirementsDataGrid.Focus();
-        }
-
         public static ScrollViewer GetScrollViewer(UIElement element)
         {
             if (element == null) return null;
@@ -755,6 +701,7 @@ namespace VisualComparer
         private async void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
         {
             TCFilter.Text = "";
+            RefreshRequirementsDataGrid();
             AllTCsListBox.SelectedItems.Clear();
             await ShowOneChapter(0);
         }
@@ -808,14 +755,6 @@ namespace VisualComparer
         {
             ValidIn.SelectedIndex = 0;
             ValidIn.UpdateLayout();
-        }
-
-        private void Helper_GotFocus(object sender, RoutedEventArgs e)
-        {
-            var helper = (DataGrid)sender;
-            helper.SelectedItems.Clear();
-
-            RequirementsDataGrid.Focus();
         }
     }
 }
