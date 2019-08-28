@@ -112,6 +112,7 @@ namespace ReqComparer
                                     .Replace("]", "")
                                     .Split('/')
                                     .Select(z => z == "" || z == "." ? "-" : z)
+                                    .Select(z => Regex.Match(z, @"\d{2}\.\d").Value)
                                     .ToArray();
 
                                 if (ValidFromToValues.Length >= 2)

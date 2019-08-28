@@ -36,6 +36,7 @@
                 <ComboBoxItem Content="20.1"/>
                 <ComboBoxItem Content="20.2"/>
                 <ComboBoxItem Content="21.1"/>
+                <ComboBoxItem Content="Not Closed"/>
             </ComboBox>
             <TextBox Grid.Row="2" Name="TCFilter" Margin="5 2" TextChanged="TCFilter_TextChanged" VerticalAlignment="Center"/>
             <ListBox Grid.Row="3" Name="AllTCsListBox" Margin="10 5" 

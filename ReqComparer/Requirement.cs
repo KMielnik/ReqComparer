@@ -78,6 +78,9 @@ namespace ReqComparer
         {
             if (version == "-" || version is null)
                 return true;
+            if (version == "Not Closed")
+                return ValidTo == "-";
+
             var selectedVersion = int.Parse(version.Replace(".", ""));
 
             bool isValidBefore;
