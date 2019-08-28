@@ -38,7 +38,8 @@
                 <ComboBoxItem Content="21.1"/>
                 <ComboBoxItem Content="Not Closed"/>
             </ComboBox>
-            <TextBox Grid.Row="2" Name="TCFilter" Margin="5 2" TextChanged="TCFilter_TextChanged" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="2" Name="TCFilter" Margin="5 2" TextChanged="TCFilter_TextChanged" 
+                     VerticalAlignment="Center" KeyDown="TCFilter_KeyDown"/>
             <ListBox Grid.Row="3" Name="AllTCsListBox" Margin="10 5" 
                          ScrollViewer.CanContentScroll="True"
                  SelectionMode="Multiple"

@@ -81,7 +81,11 @@ namespace VisualComparer
                 if (string.IsNullOrEmpty(TCFilter.Text))
                     return true;
 
-                return x.ToString().StartsWith(TCFilter.Text);
+                var delimeter = Regex.Match(TCFilter.Text, "[^0-9]");
+                if(!delimeter.Success)
+                    return x.ToString().StartsWith(TCFilter.Text);
+
+                return x.ToString().StartsWith(TCFilter.Text.Split(delimeter.Value.ToCharArray()).Last());
             };
         }
 
@@ -755,6 +759,20 @@ namespace VisualComparer
         {
             ValidIn.SelectedIndex = 0;
             ValidIn.UpdateLayout();
+        }
+
+        private async void TCFilter_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter)
+                return;
+
+            e.Handled = true;
+            var tcs = TCFilter.Text
+                .Trim()
+                .Split(' ')
+                .Select(x => int.Parse(x))
+                .ToList();
+            await SelectMultipleTCs(tcs);
         }
     }
 }
