@@ -24,7 +24,6 @@
             <Button Content="Doors Exporter" Padding="8 3" Margin="20 0"
                     VerticalAlignment="Center" HorizontalAlignment="Right"
                     Click="ExporterButton_Click"/>
-            
         </Grid>
     </Grid>
 </Window>

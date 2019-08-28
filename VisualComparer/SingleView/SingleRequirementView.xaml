@@ -19,6 +19,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="62"/>
+                <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Test Case Filters" FontWeight="Bold"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -81,6 +82,8 @@
                     <Button Content="Clear" Click="ChapterClear_Click" Margin="1"/>
                 </StackPanel>
             </Grid>
+            <Button Grid.Row="6" Content="Select TCs For Selected Reqs" Click="SelectTCForReqsButton_Click"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
         <Grid Grid.Column="1" Margin="10">
             <DataGrid Name="ReqHelperTop" Height="16" VerticalAlignment="Top" FontSize="10"

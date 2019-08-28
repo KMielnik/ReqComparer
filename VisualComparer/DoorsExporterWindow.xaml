@@ -37,10 +37,10 @@
                 <Button Content="Select Output File" Name="OutputButton" Width="120" VerticalAlignment="Center" HorizontalAlignment="Right" Padding="10 3" Click="OutputButton_Click"/>
                 <CheckBox Content="Overwrite Default File" Margin="2" HorizontalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
             </StackPanel>
-            
+
         </Grid>
 
-        <Grid Grid.Row="3" Margin="10">
+        <Grid Grid.Row="4" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>

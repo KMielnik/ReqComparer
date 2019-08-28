@@ -259,8 +259,6 @@ namespace VisualComparer
 
             if (showAllTCs)
             {
-                AllTCsListBox.SelectedItems.Clear();
-
                 var selectedTCs = chapterReqs
                     .SelectMany(x => x.TCIDsValue)
                     .Distinct()
@@ -773,6 +771,19 @@ namespace VisualComparer
                 .Select(x => int.Parse(x))
                 .ToList();
             await SelectMultipleTCs(tcs);
+        }
+
+        private async void SelectTCForReqsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedTCs = RequirementsDataGrid.SelectedItems
+                .Cast<RequirementSingleView>()
+                .SelectMany(x => x.TCIDsValue)
+                .Distinct()
+                .ToList();
+
+            await SelectMultipleTCs(selectedTCs);
+
+            await PushSelectedTCsUp();
         }
     }
 }

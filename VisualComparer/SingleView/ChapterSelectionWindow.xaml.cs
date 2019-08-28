@@ -24,6 +24,8 @@ namespace VisualComparer
     {
         public ObservableCollection<(string chapter, int id)> Reqs { get; set; }
         public (string chapter, int id) Answer { get; private set; }
+        public bool SelectTCs { get; set; }
+        public bool ClearPreviousTCs { get; set; }
         public ChapterSelectionWindow(ObservableCollection<RequirementSingleView> requirements)
         {
             InitializeComponent();
@@ -46,6 +48,9 @@ namespace VisualComparer
 
                 return (x as (string chapter, int id)?).Value.chapter.StartsWith(ChapterFilterTextBox.Text);
             };
+
+            SelectTCs = true;
+            ClearPreviousTCs = true;
         }
 
         private void ReqsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
