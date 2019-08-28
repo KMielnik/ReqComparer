@@ -22,7 +22,7 @@ namespace VisualComparer
     /// </summary>
     public partial class ChapterSelectionWindow : Window
     {
-        public ObservableCollection<(string chapter, int id)> Reqs { get; set; }
+        public ObservableCollection<(string chapter, int id)> Chapters { get; set; }
         public (string chapter, int id) Answer { get; private set; }
         public bool SelectTCs { get; set; }
         public bool ClearPreviousTCs { get; set; }
@@ -31,16 +31,16 @@ namespace VisualComparer
             InitializeComponent();
             DataContext = this;
 
-            Reqs = new ObservableCollection<(string chapter, int id)>();
+            Chapters = new ObservableCollection<(string chapter, int id)>();
 
             requirements
                 .Where(x => x.Type == Requirement.Types.Head)
                 .Select(x => (chapter: Regex.Match(x.Text, @"^\d+\.[\d.]+").Value, id: x.IDValue))
                 .Where(x => !string.IsNullOrWhiteSpace(x.chapter))
                 .ToList()
-                .ForEach(x => Reqs.Add(x));
+                .ForEach(x => Chapters.Add(x));
 
-            var ChapterView = CollectionViewSource.GetDefaultView(Reqs);
+            var ChapterView = CollectionViewSource.GetDefaultView(Chapters);
             ChapterView.Filter = x =>
             {
                 if (string.IsNullOrWhiteSpace(ChapterFilterTextBox.Text))
@@ -64,6 +64,9 @@ namespace VisualComparer
 
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
+            if (Chapters.Any(x=>x.chapter == ChapterFilterTextBox.Text))
+                ReqsListView.SelectedItem = Chapters.FirstOrDefault(x=>x.chapter == ChapterFilterTextBox.Text);
+
             if (ReqsListView.SelectedItem == null && ReqsListView.Items.Count !=1)
             {
                 MessageBox.Show("Please select chapter.");
@@ -76,7 +79,7 @@ namespace VisualComparer
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            CollectionViewSource.GetDefaultView(Reqs).Refresh();
+            CollectionViewSource.GetDefaultView(Chapters).Refresh();
             if (ReqsListView.Items.Count != 0)
                 ReqsListView.ScrollIntoView(ReqsListView.Items[0]);
         }

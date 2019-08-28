@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:VisualComparer"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
         Title="Select Chapter" SizeToContent="Width" ContentRendered="Window_ContentRendered"
-        MinWidth="300" MinHeight="200" Height="300">
+        MinWidth="300" MinHeight="250" Height="350">
     <Window.Resources>
         <local:TupleDisplayChapterConverter x:Key="converter"/>
     </Window.Resources>
@@ -18,9 +18,9 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
-        <ListView ItemsSource="{Binding Reqs}" Grid.Row="0" Name="ReqsListView"
+        <ListView ItemsSource="{Binding Chapters}" Grid.Row="0" Name="ReqsListView"
                   MouseDoubleClick="ReqsListView_MouseDoubleClick"
-                  Margin="20" MinWidth="100">
+                  Margin="10" MinWidth="100">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Converter={StaticResource converter}, Mode=OneWay}" FontWeight="Bold"/>

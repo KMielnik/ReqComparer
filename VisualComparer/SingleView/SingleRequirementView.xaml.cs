@@ -715,12 +715,16 @@ namespace VisualComparer
             if (chapterSelectionWindow.DialogResult == true)
             {
                 Mouse.OverrideCursor = Cursors.Wait;
-                AllTCsListBox.SelectedItems.Clear();
-                RequirementsDataGrid.UpdateLayout();
+                if (chapterSelectionWindow.ClearPreviousTCs)
+                {
+                    RefreshRequirementsDataGrid();
+                    AllTCsListBox.SelectedItems.Clear();
+                    RequirementsDataGrid.UpdateLayout();
+                }
 
                 var selectedChapter = chapterSelectionWindow.Answer;
                 Console.WriteLine(selectedChapter.chapter);
-                await ShowOneChapter(selectedChapter.id, true);
+                await ShowOneChapter(selectedChapter.id, chapterSelectionWindow.SelectTCs);
                 ChapterNameTextBlock.Text = selectedChapter.chapter;
                 Mouse.OverrideCursor = Cursors.Arrow;
             }
