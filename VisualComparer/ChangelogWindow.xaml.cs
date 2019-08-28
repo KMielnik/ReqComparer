@@ -20,7 +20,7 @@ namespace VisualComparer
     /// </summary>
     public partial class ChangelogWindow : Window
     {
-        private const string changelogPath = @"\\10.128.3.1\DFS_data_SSC_FS_Images-SSC\KMIM\MiniDoorsy\Data\changelog.rtf";
+        private const string changelogPath = @"\\10.128.3.1\DFS_Data_KBN_RnD_FS_Programs\Support_Tools\FakeDOORS\Data\changelog.rtf";
         public ChangelogWindow()
         {
             InitializeComponent();

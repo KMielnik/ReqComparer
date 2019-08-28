@@ -69,13 +69,13 @@ namespace VisualComparer
 
         private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Do you want to replace actual cached file with newest one from server?", "Confirm replacement.",
+            var result = MessageBox.Show("Do you want to replace actual cached file with latest one from server?", "Confirm replacement.",
                 MessageBoxButton.OKCancel, MessageBoxImage.Question);
             if (result == MessageBoxResult.OK)
             {
                 await parser.DownloadNewestVersion();
                 await LoadReqsFromCache();
-                UpdateButton.Content = "Get newest version";
+                UpdateButton.Content = "Get latest version";
                 UpdateButton.Background = Brushes.Gainsboro;
             }
         }
