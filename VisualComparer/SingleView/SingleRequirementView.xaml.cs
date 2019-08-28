@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -334,6 +334,18 @@ namespace VisualComparer
                 Handler = new MouseButtonEventHandler(ColumnHeader_RightClickEvent)
             });
 
+            TCColumn.HeaderStyle.Setters.Add(new EventSetter()
+            {
+                Event = MouseDoubleClickEvent,
+                Handler = new MouseButtonEventHandler(ColumnHeader_DoubleClickEvent)
+            });
+
+            TCColumn.HeaderStyle.Setters.Add(new EventSetter()
+            {
+                Event = MouseRightButtonDownEvent,
+                Handler = new MouseButtonEventHandler(ColumnHeader_RightClickEvent)
+            });
+
             TCColumn.HeaderStyle.Setters.Add(new Setter()
             {
                 Property = ToolTipProperty,
@@ -530,6 +542,60 @@ namespace VisualComparer
             }
         }
 
+        private void Helper_LeftClickEvent(object sender, MouseButtonEventArgs e)
+        {
+            var gridCell = (DataGridCell)sender;
+            var tc = (int)gridCell.Column.Header;
+
+            var senderDatagrid = VisualTreeHelper.GetParent(gridCell);
+            while (senderDatagrid != null && senderDatagrid.GetType() != typeof(DataGrid))
+                senderDatagrid = VisualTreeHelper.GetParent(senderDatagrid);
+
+            var isGoingDown = ((DataGrid)senderDatagrid).Name == nameof(ReqHelperBottom);
+
+            var selectedRows = RequirementsDataGrid.SelectedItems.Count;
+
+            if (selectedRows >= 1)
+            {
+                var firstSelected = (RequirementSingleView)RequirementsDataGrid.SelectedItems[0];
+                RequirementsDataGrid.SelectedItems.Clear();
+
+                if (firstSelected.TCIDsValue.Contains(tc))
+                    RequirementsDataGrid.SelectedItems.Add(firstSelected);
+                else
+                    RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+
+                RequirementsDataGrid.ScrollIntoView(firstSelected);
+
+                if (selectedRows > 1)
+                    return;
+
+
+                RequirementsDataGrid.SelectedItems.Clear();
+                var reqs = reqsCollection.AsEnumerable();
+                if (isGoingDown == false)
+                    reqs = reqs.Reverse();
+
+                RequirementsDataGrid.SelectedItems
+                    .Add(reqs
+                        .SkipWhile(x => x != firstSelected)
+                        .Skip(1)
+                        .FirstOrDefault(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+
+                if (RequirementsDataGrid.SelectedItem == null)
+                    RequirementsDataGrid.SelectedItems.Add(firstSelected);
+
+                RequirementsDataGrid.ScrollIntoView(RequirementsDataGrid.SelectedItem);
+            }
+            else
+            {
+                RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+                RequirementsDataGrid.ScrollIntoView((RequirementSingleView)RequirementsDataGrid.SelectedItems[0]);
+            }
+
+            RequirementsDataGrid.Focus();
+        }
+
         public static ScrollViewer GetScrollViewer(UIElement element)
         {
             if (element == null) return null;
@@ -668,16 +734,16 @@ namespace VisualComparer
                 .Reverse()
                 .ToList();
 
-            if (selectedTcs.Count != 1 || FilteredTCs.IndexOf(selectedTcs[0]) != 0)
-            {
-                var tempFilter = TCFilter.Text;
-                TCFilter.Text = "";
+            if (selectedTcs.Count == 1 && FilteredTCs.IndexOf(selectedTcs[0]) == 0)
+                return;
 
-                selectedTcs
-                    .ForEach(x => FilteredTCs.Move(FilteredTCs.IndexOf(x), 0));
+            var tempFilter = TCFilter.Text;
+            TCFilter.Text = "";
 
-                TCFilter.Text = tempFilter;
-            }
+            selectedTcs
+                .ForEach(x => FilteredTCs.Move(FilteredTCs.IndexOf(x), 0));
+
+            TCFilter.Text = tempFilter;
             AllTCsListBox.UpdateLayout();
             await RefreshHelpers();
         }
@@ -742,6 +808,14 @@ namespace VisualComparer
         {
             ValidIn.SelectedIndex = 0;
             ValidIn.UpdateLayout();
+        }
+
+        private void Helper_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var helper = (DataGrid)sender;
+            helper.SelectedItems.Clear();
+
+            RequirementsDataGrid.Focus();
         }
     }
 }

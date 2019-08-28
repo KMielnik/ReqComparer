@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualComparer"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="ChangelogWindow" Width="300" Height="400">
+        Title="ChangelogWindow" Width="800" Height="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -13,6 +13,6 @@
         </Grid.RowDefinitions>
         <RichTextBox Loaded="RichTextBox_Loaded" Margin="10" IsReadOnly="True"/>
         <Button IsDefault="True" IsCancel="True" Grid.Row="1" Content="Ok" Padding="10 3" Margin="10 0"
-                HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                HorizontalAlignment="Right" VerticalAlignment="Center" Click="Button_Click"/>
     </Grid>
 </Window>

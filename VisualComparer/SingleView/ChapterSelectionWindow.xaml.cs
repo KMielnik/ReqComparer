@@ -72,6 +72,8 @@ namespace VisualComparer
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(Reqs).Refresh();
+            if (ReqsListView.Items.Count != 0)
+                ReqsListView.ScrollIntoView(ReqsListView.Items[0]);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)

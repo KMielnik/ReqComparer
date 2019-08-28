@@ -94,7 +94,6 @@
                       ColumnDisplayIndexChanged="RequirementsDataGrid_ColumnDisplayIndexChanged"
                       VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"/>
 
-
             <DataGrid Name="ReqHelperBottom" Height="16" VerticalAlignment="Bottom"
                       HeadersVisibility="None" VerticalScrollBarVisibility="Disabled"
                       HorizontalScrollBarVisibility="Hidden" GotFocus="Helper_GotFocus"
