@@ -15,7 +15,7 @@ namespace ConsoleTester
             var reqParser = new ReqParser();
             var timer = new System.Diagnostics.Stopwatch();
             timer.Start();
-            await reqParser.ParseToFileAsync(new Progress<string>(x => { Console.WriteLine($"Stan:{x}"); }),"e.htm");
+            await reqParser.ParseToFileAsync(new Progress<string>(x => { Console.WriteLine($"Stan:{x}"); }), @"\\10.128.3.1\DFS_data_SSC_FS_Images-SSC\KMIM\_Fitting_SW_PR_Phoenix.htm");
             timer.Stop();
             Console.WriteLine($"Czas parsowania: {timer.Elapsed}");
 

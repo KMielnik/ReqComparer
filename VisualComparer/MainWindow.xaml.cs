@@ -5,6 +5,7 @@ using ReqComparer;
 using System.Deployment.Application;
 using System.Threading;
 using System.Windows.Media;
+using System.Linq;
 
 namespace VisualComparer
 {

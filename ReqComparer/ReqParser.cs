@@ -10,6 +10,7 @@ using System.Net;
 using Newtonsoft.Json;
 using System.Timers;
 using System.Diagnostics;
+using static MoreLinq.Extensions.BatchExtension;
 
 namespace ReqComparer
 {
@@ -17,31 +18,40 @@ namespace ReqComparer
     {
         public const string defaultCachedFileName = "cached_reqs.json";
         private const string defaultServerCachedFileName = @"\\10.128.3.1\DFS_Data_KBN_RnD_FS_Programs\Support_Tools\FakeDOORS\Data\cached_reqs.json";
-        public static readonly HashSet<TestCase> AllTestCases = new HashSet<TestCase>();
 
-        private HtmlDocument document;
-
-        public async Task LoadFromFile(string filename)
-            => await Task.Run(() =>
-            {
-                document = new HtmlDocument();
-                string text = File.ReadAllText(filename);
-                text = text.Replace("<br>", "\t");
-                document.LoadHtml(text);
-            });
-
-        public void Unload()
+        private async Task<HtmlDocument> LoadDocumentFromString(string text)
+        => await Task.Run(() =>
         {
-            document = null;
-        }
+            var document = new HtmlDocument();
+            document.LoadHtml(text);
+            return document;
+        });
 
-        public List<Requirement> GetRequiermentsList()
+        private async Task<IEnumerable<string>> LoadExportFileInParts(string filename)
+        => await Task.Run(() =>
         {
-            AllTestCases.Clear();
+            var file = File.ReadAllText(filename);
+            file = file.Replace("<br>", "\t");
+            file = Regex.Replace(file, @"^</a>", "");
+            var body = Regex.Match(file, @"<BODY .+?>").Value;
+            file = file.Substring(file.IndexOf(body) + body.Length);
 
+            const int batchSize = 50;
+
+            var xd = Regex.Split(file, @"<a name=.+?>")
+                .Batch(batchSize)
+                .Select(x => x.Aggregate(new StringBuilder(), (acc, y) => acc.AppendLine(y)).ToString());
+
+            return xd;
+        });
+
+
+        public Task<List<Requirement>> GetRequiermentsList(HtmlDocument document)
+        => Task.Run(() =>
+        {
             var divs = document
                 .DocumentNode
-                .SelectNodes("//body/div")
+                .SelectNodes("/div")
                 .Reverse()
                 .Skip(1)
                 .Reverse()
@@ -136,7 +146,7 @@ namespace ReqComparer
                         .TakeWhile(y => !y.Contains("Hardware Variants (use CTRL-R for edit):"))
                         .Select(y => y.Trim())
                         .Aggregate("", (acc, y) => acc + y)
-                        .Replace("Functional Variants (use CTRL-R for edit):","")
+                        .Replace("Functional Variants (use CTRL-R for edit):", "")
                         .Trim();
 
                     var typeString = reqStrings
@@ -147,7 +157,7 @@ namespace ReqComparer
 
                     var type = Requirement.Types.Req;
 
-                    switch(typeString)
+                    switch (typeString)
                     {
                         case "Info":
                             type = Requirement.Types.Info;
@@ -171,24 +181,32 @@ namespace ReqComparer
                 .ToList();
 
             return requirments;
-        }
+        });
 
         public async Task ParseToFileAsync(IProgress<string> progress, string input, string output = defaultCachedFileName)
         {
-            progress.Report("Loading file...(This will take a few mins.)");
+            progress.Report("Loading file...");
 
             var clock = new Stopwatch();
-            var timer = new Timer(1000);
-            timer.Elapsed += (s, e) => progress.Report($"Loading file...(This will take a few mins.) {clock.Elapsed.ToString().Substring(0, 8)}");
 
             clock.Start();
-            timer.Start();
-            await LoadFromFile(input);
-            timer.Stop();
-            clock.Stop();
 
-            progress.Report("Parsing requirements...");
-            var requirements = GetRequiermentsList();
+            progress.Report("Splitting file in parts.");
+            var documentTasks = (await LoadExportFileInParts(input))
+                .Select(x => LoadDocumentFromString(x))
+                .ToList();
+
+            var requirements = new List<Requirement>();
+
+            for (int i = 0; i < documentTasks.Count; i++)
+            {
+                progress.Report($"Parsing file ({i}/{documentTasks.Count}).");
+                var document = await documentTasks[i];
+                var reqsPart = await GetRequiermentsList(document);
+                requirements.AddRange(reqsPart);
+            }
+
+            clock.Stop();
 
             progress.Report("Saving to file...");
 
@@ -197,8 +215,7 @@ namespace ReqComparer
                     JsonConvert.SerializeObject(DateTime.Now),
                     JsonConvert.SerializeObject(requirements)
                 });
-            Unload();
-            progress.Report("Done.");
+            progress.Report($"Done. (in {clock.Elapsed.Seconds}s.)");
         }
 
         public async Task<(List<Requirement> reqs,DateTime exportDate)> GetReqsFromCachedFile(string filename = defaultCachedFileName)
@@ -238,10 +255,5 @@ namespace ReqComparer
         {
             File.Copy(defaultServerCachedFileName, defaultCachedFileName, true);
         });
-                
-        public string GetRequiermentsString()
-            => GetRequiermentsList()
-                .Select(x => $"{new string('\t', x.Level)}{x.ID}: {x.Text}\n")
-                .Aggregate((acc, x) => acc + x);
     }
 }
