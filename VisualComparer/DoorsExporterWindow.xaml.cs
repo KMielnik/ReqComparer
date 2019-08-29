@@ -74,8 +74,9 @@ namespace VisualComparer
                     OutputTextBox.Text)
                     .ContinueWith((s)=>MessageBox.Show("Parsing done"));
                 await parseTask;
+                await parser.GetReqsFromCachedFile(OutputTextBox.Text);
             }
-            catch(Exception)
+            catch
             {
                 ProgressTextBlock.Text = "ERROR!";
                 MessageBox.Show("Error while parsing the file", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
