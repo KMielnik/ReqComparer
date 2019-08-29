@@ -84,6 +84,11 @@ namespace VisualComparer
         private void ExporterButton_Click(object sender, RoutedEventArgs e)
         {
             var exporterWindow = new DoorsExporterWindow(parser);
+            exporterWindow.Closed += async (s, args) => 
+            {
+                if (File.Exists(exporterWindow.OutputTextBox.Text))
+                    await LoadReqsFromCache(exporterWindow.OutputTextBox.Text);
+            };
             exporterWindow.Show();
         }
 

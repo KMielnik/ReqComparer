@@ -71,10 +71,8 @@ namespace VisualComparer
                 parseTask = parser.ParseToFileAsync(
                     new Progress<string>(x => ProgressTextBlock.Text = x),
                     InputTextBox.Text,
-                    OutputTextBox.Text)
-                    .ContinueWith((s)=>MessageBox.Show("Parsing done"));
+                    OutputTextBox.Text);
                 await parseTask;
-                await parser.GetReqsFromCachedFile(OutputTextBox.Text);
             }
             catch
             {
