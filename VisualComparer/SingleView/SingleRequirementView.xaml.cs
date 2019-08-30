@@ -52,6 +52,7 @@ namespace VisualComparer
             this.basicReqs.CollectionChanged += BasicReqs_CollectionChanged;
 
             RequirementsDataGrid.ItemsSource = reqsCollection;
+            SetReqDataGridFilter();
             AllTCsListBox.ItemsSource = FilteredTCs;
             SetTCListView();
 
@@ -66,6 +67,17 @@ namespace VisualComparer
 
             setBoldDataTrigger(RequirementsDataGrid);
             setVisibilityDataTrigger(RequirementsDataGrid);
+        }
+
+        private void SetReqDataGridFilter()
+        {
+            var reqDataGridFilter = CollectionViewSource.GetDefaultView(reqsCollection);
+            reqDataGridFilter.Filter = x =>
+            {
+                var req = x as RequirementSingleView;
+                var ValidInVersion = (ValidIn.SelectedItem as ComboBoxItem)?.Content.ToString();
+                return req.IsValidInSpecifiedVersion(ValidInVersion) && !req.IsDropped;
+            };
         }
 
         private static SolidColorBrush GetBrushFromHex(string hex)
@@ -171,7 +183,8 @@ namespace VisualComparer
         {
             await SetReqDataGrid();
             GetScrollViewer(RequirementsDataGrid)
-                .ScrollToVerticalOffset(reqsCollection.IndexOf(reqsCollection
+                .ScrollToVerticalOffset(RequirementsDataGrid.Items.IndexOf(RequirementsDataGrid.Items
+                    .Cast<RequirementSingleView>()
                     .Skip(1)
                     .First(x => x.Type == ReqComparer.Requirement.Types.Head)));
             ChapterNameTextBlock.Text = "-";
@@ -275,7 +288,7 @@ namespace VisualComparer
                 .ForEach(x => x.IsVisible = false);
 
             var scrollViewer = GetScrollViewer(RequirementsDataGrid);
-            scrollViewer.ScrollToVerticalOffset(reqsCollection.IndexOf(firstChapterReq));
+            scrollViewer.ScrollToVerticalOffset(RequirementsDataGrid.Items.IndexOf(firstChapterReq));
 
             RequirementsDataGrid.Items.Refresh();
             await RefreshHelpers();
@@ -393,7 +406,7 @@ namespace VisualComparer
         {
             var TC = (int)(sender as System.Windows.Controls.Primitives.DataGridColumnHeader).Content;
             RequirementsDataGrid.SelectedItems.Clear();
-            reqsCollection
+            RequirementsDataGrid.Items.Cast<RequirementSingleView>()
                 .Where(x => x.TCIDsValue.Contains(TC))
                 .ToList()
                 .ForEach(x => RequirementsDataGrid.SelectedItems.Add(x));
@@ -406,11 +419,11 @@ namespace VisualComparer
 
             var tcID = (int)header.Content;
 
-            var firstOccurence = reqsCollection
+            var firstOccurence = RequirementsDataGrid.Items.Cast<RequirementSingleView>()
                     .TakeWhile(x => x.TCIDsValue.Contains(tcID) != true)
                     .Count();
 
-            var lastOccurence = reqsCollection.Count() - reqsCollection
+            var lastOccurence = RequirementsDataGrid.Items.Cast<RequirementSingleView>().Count() - RequirementsDataGrid.Items.Cast<RequirementSingleView>()
                    .Reverse()
                    .TakeWhile(x => x.TCIDsValue.Contains(tcID) != true)
                    .Count();
@@ -510,7 +523,7 @@ namespace VisualComparer
                     RequirementsDataGrid.SelectedItems.Add(firstSelected);
                 else
                 {
-                    RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+                    RequirementsDataGrid.SelectedItems.Add(RequirementsDataGrid.Items.Cast<RequirementSingleView>().First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
                     RequirementsDataGrid.ScrollIntoView(firstSelected);
                     return;
                 }
@@ -522,7 +535,7 @@ namespace VisualComparer
 
 
                 RequirementsDataGrid.SelectedItems.Clear();
-                var reqs = reqsCollection.AsEnumerable();
+                var reqs = RequirementsDataGrid.Items.Cast<RequirementSingleView>().AsEnumerable();
                 if (isGoingDown == false)
                     reqs = reqs.Reverse();
 
@@ -539,7 +552,7 @@ namespace VisualComparer
             }
             else
             {
-                RequirementsDataGrid.SelectedItems.Add(reqsCollection.First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
+                RequirementsDataGrid.SelectedItems.Add(RequirementsDataGrid.Items.Cast<RequirementSingleView>().First(x => x.TCIDsValue.Contains(tc) && x.IsVisible));
                 RequirementsDataGrid.ScrollIntoView((RequirementSingleView)RequirementsDataGrid.SelectedItems[0]);
             }
         }
@@ -585,11 +598,11 @@ namespace VisualComparer
 
                 if (reqsCollection.AsParallel().Any(x => x.IsVisible == false))
                 {
-                    var firstVisible = reqsCollection
-                        .IndexOf(reqsCollection
+                    var firstVisible = RequirementsDataGrid.Items
+                        .IndexOf(RequirementsDataGrid.Items.Cast<RequirementSingleView>()
                             .First(x => x.IsVisible == true));
-                    var lastVisible = reqsCollection
-                        .IndexOf(reqsCollection
+                    var lastVisible = RequirementsDataGrid.Items
+                        .IndexOf(RequirementsDataGrid.Items.Cast<RequirementSingleView>()
                             .Last(x => x.IsVisible == true));
 
                     if (lastVisible < lastRow)
@@ -617,7 +630,7 @@ namespace VisualComparer
                     var TCSelectedString = TCSelected.ToString();
                     if (ReqTopHelperData[0].ContainsKey(TCSelectedString))
                     {
-                        var firstOccurence = reqsCollection
+                        var firstOccurence = RequirementsDataGrid.Items.Cast<RequirementSingleView>()
                             .TakeWhile(x => x.TCIDsValue.Contains(TCSelected) != true)
                             .Count();
 
@@ -629,7 +642,7 @@ namespace VisualComparer
 
                     if (ReqBottomHelperData[0].ContainsKey(TCSelectedString))
                     {
-                        var lastOccurence = reqsCollection.Count() - reqsCollection
+                        var lastOccurence = RequirementsDataGrid.Items.Cast<RequirementSingleView>().Count() - RequirementsDataGrid.Items.Cast<RequirementSingleView>()
                           .Reverse()
                           .TakeWhile(x => x.TCIDsValue.Contains(TCSelected) != true)
                           .Count();
@@ -667,6 +680,12 @@ namespace VisualComparer
         private async void ValidFrom_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             RefreshFilteredTCs();
+            CollectionViewSource.GetDefaultView(reqsCollection).Refresh();
+            GetScrollViewer(RequirementsDataGrid)
+                .ScrollToVerticalOffset(RequirementsDataGrid.Items.IndexOf(RequirementsDataGrid.Items
+                    .Cast<RequirementSingleView>()
+                    .Skip(1)
+                    .FirstOrDefault(x => x.Type == ReqComparer.Requirement.Types.Head)));
             await ShowOneChapter(0);
         }
 

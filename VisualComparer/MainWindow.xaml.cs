@@ -6,6 +6,7 @@ using System.Deployment.Application;
 using System.Threading;
 using System.Windows.Media;
 using System.Linq;
+using System.Windows.Controls.Primitives;
 
 namespace VisualComparer
 {
@@ -65,6 +66,7 @@ namespace VisualComparer
             {
                 UpdateButton.Content = "Update Available!";
                 UpdateButton.Background = Brushes.Red;
+                UpdateButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
             }
         }
 

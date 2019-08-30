@@ -23,6 +23,11 @@ namespace ReqComparer
         public string TCStringified { get; private set; }
         [JsonIgnore]
         public bool IsImportant { get; private set; }
+        public string Status { get; private set; }
+        [JsonIgnore]
+        public bool IsDropped => Status == "dropped";
+        public string ValidFrom { get; set; }
+        public string ValidTo { get; set; }
 
         public enum Types
         {
@@ -31,7 +36,11 @@ namespace ReqComparer
             Info
         }
 
-        public Requirement(string iD, string text, int level, List<TestCase> TCs, string fVariants, Types type)
+        public bool IsValidInSpecifiedVersion(string version)
+        => ValidInChecker.IsValidIn(version, ValidFrom, ValidTo);
+        
+
+        public Requirement(string iD, string text, int level, List<TestCase> TCs, string fVariants, Types type, string status, string ValidFrom, string ValidTo)
         {
             ID = iD;
             IDValue = int.Parse(ID.Replace("PR_PH_", ""));
@@ -42,6 +51,10 @@ namespace ReqComparer
             FVariants = fVariants;
 
             this.Type = type;
+
+            this.Status = status;
+            this.ValidFrom = ValidFrom;
+            this.ValidTo = ValidTo;
 
             this.TCs = new List<TestCase>();
 
@@ -75,6 +88,24 @@ namespace ReqComparer
         }
 
         public bool IsValidInSpecifiedVersion(string version)
+        => ValidInChecker.IsValidIn(version, ValidFrom, ValidTo);
+
+        public override int GetHashCode()
+        => IDValue;
+        
+
+        public override bool Equals(object obj)
+        {
+            var testCase = obj as TestCase;
+            if (testCase is null)
+                return false;
+            return IDValue == testCase.IDValue;
+        }
+    }
+
+    static class ValidInChecker
+    {
+        public static bool IsValidIn(string version, string ValidFrom, string ValidTo)
         {
             if (version == "-" || version is null)
                 return true;
@@ -101,19 +132,6 @@ namespace ReqComparer
                 isValidAfter = validAfter >= selectedVersion;
             }
             return isValidBefore && isValidAfter;
-        }
-
-        public override int GetHashCode()
-        {
-            return IDValue;
-        }
-
-        public override bool Equals(object obj)
-        {
-            var testCase = obj as TestCase;
-            if (testCase is null)
-                return false;
-            return IDValue == testCase.IDValue;
         }
     }
 }

@@ -64,14 +64,6 @@ namespace ReqComparer
                 .SelectNodes("/div")
                 .ToList();
 
-            var minimalMargin = divs
-                .AsParallel()
-                .Select(x =>
-                    int.Parse(x.GetAttributeValue("style", "0")
-                        .Replace("margin-left:", "")
-                        .Replace("px", "")))
-                .Min();
-
             var requirments = divs
                 .AsParallel().AsOrdered()
                 .Select(x =>
@@ -98,7 +90,7 @@ namespace ReqComparer
                         .Replace("margin-left: ", "")
                         .Replace("px", ""));
 
-                    int indentLevel = (margin - minimalMargin) / 36;
+                    int indentLevel = margin / 36;
 
                     var TCs = reqStrings
                         .Where(y => y.Contains("TC ID & Title"))
@@ -114,12 +106,12 @@ namespace ReqComparer
 
                             var tcText = Regex.Match(y, "TC.*").Value;
 
-                            string ValidFrom, ValidTo;
+                            string ValidFromTC, ValidToTC;
                             var validFromTo = Regex.Match(y, @"\[[0-9./-]+\]");
                             if (validFromTo.Success == false)
                             {
-                                ValidFrom = "-";
-                                ValidTo = "-";
+                                ValidFromTC = "-";
+                                ValidToTC = "-";
                             }
                             else
                             {
@@ -128,23 +120,23 @@ namespace ReqComparer
                                     .Replace("[", "")
                                     .Replace("]", "")
                                     .Split('/')
-                                    .Select(z => z == "" || z == "." ? "-" : z)
                                     .Select(z => Regex.Match(z, @"\d{2}\.\d").Value)
+                                    .Select(z => string.IsNullOrWhiteSpace(z) || z == "." ? "-" : z)
                                     .ToArray();
 
                                 if (ValidFromToValues.Length >= 2)
                                 {
-                                    ValidFrom = ValidFromToValues[0];
-                                    ValidTo = ValidFromToValues[1];
+                                    ValidFromTC = ValidFromToValues[0];
+                                    ValidToTC = ValidFromToValues[1];
                                 }
                                 else
                                 {
-                                    ValidFrom = ValidFromToValues[0];
-                                    ValidTo = ValidFromToValues[0];
+                                    ValidFromTC = ValidFromToValues[0];
+                                    ValidToTC = ValidFromToValues[0];
                                 }
                             }
 
-                            return new TestCase(id, tcText, (ValidFrom, ValidTo));
+                            return new TestCase(id, tcText, (ValidFromTC, ValidToTC));
                         })
                         .ToList();
 
@@ -177,13 +169,36 @@ namespace ReqComparer
                             break;
                     }
 
+                    var status = reqStrings
+                        .Where(y => y.Contains("Status:"))
+                        .FirstOrDefault()
+                        .Replace("Status:", "")
+                        .Trim();
+
+                    var ValidFrom = reqStrings
+                        .Where(y => y.Contains("ValidFrom:"))
+                        .Select(y => Regex.Match(y, @"\d\d\.\d").Value)
+                        .Select(y => string.IsNullOrWhiteSpace(y) ? "-" : y)
+                        .FirstOrDefault();
+
+                    var ValidTo = reqStrings
+                        .Where(y => y.Contains("ValidTo:"))
+                        .Select(y => Regex.Match(y, @"\d\d\.\d").Value)
+                        .Select(y => string.IsNullOrWhiteSpace(y) ? "-" : y)
+                        .FirstOrDefault();
+
+
                     return new Requirement(
                         ID,
                         text,
                         indentLevel,
                         TCs,
                         fVariants,
-                        type);
+                        type,
+                        status,
+                        ValidFrom,
+                        ValidTo
+                       );
                 })
                 .ToList();
 
