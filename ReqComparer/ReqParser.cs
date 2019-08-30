@@ -38,11 +38,21 @@ namespace ReqComparer
 
             const int batchSize = 50;
 
-            var xd = Regex.Split(file, @"<a name=.+?>")
+            var parts = Regex.Split(file, @"<a name=.+?>")
                 .Batch(batchSize)
                 .Select(x => x.Aggregate(new StringBuilder(), (acc, y) => acc.AppendLine(y)).ToString());
 
-            return xd;
+            var lastPart = parts.Last();
+            parts = parts
+                .Reverse()
+                .Skip(1)
+                .Reverse();
+
+            lastPart = Regex.Replace(lastPart, @"<DIV.+?Produced by DOORS.+?</DIV>", "");
+
+            parts = parts.Append(lastPart);
+
+            return parts;
         });
 
 
@@ -52,9 +62,6 @@ namespace ReqComparer
             var divs = document
                 .DocumentNode
                 .SelectNodes("/div")
-                .Reverse()
-                .Skip(1)
-                .Reverse()
                 .ToList();
 
             var minimalMargin = divs

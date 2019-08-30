@@ -68,6 +68,7 @@ namespace VisualComparer
 
             try
             {
+                ParseButton.IsEnabled = false;
                 parseTask = parser.ParseToFileAsync(
                     new Progress<string>(x => ProgressTextBlock.Text = x),
                     InputTextBox.Text,
@@ -78,6 +79,10 @@ namespace VisualComparer
             {
                 ProgressTextBlock.Text = "ERROR!";
                 MessageBox.Show("Error while parsing the file", "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                ParseButton.IsEnabled = true;
             }
         }
 

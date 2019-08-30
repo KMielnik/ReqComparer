@@ -46,7 +46,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Waiting..." Name="ProgressTextBlock" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-            <Button Grid.Column="1" Content="Parse doors export to cached version" 
+            <Button Grid.Column="1" Name="ParseButton" Content="Parse doors export to cached version" 
                     VerticalAlignment="Center" HorizontalAlignment="Center" Padding="10 3" Margin="5 0"
                     Click="ParseButton_Click"/>
         </Grid>
